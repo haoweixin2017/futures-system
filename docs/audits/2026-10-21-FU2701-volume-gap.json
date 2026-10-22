@@ -1,0 +1,178 @@
+{
+  "status": "APPLIED",
+  "instrument": "FU2701",
+  "minute": "2026-10-21T11:06:00",
+  "evidence_note": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.md",
+  "before": [
+    {
+      "id": 1029683,
+      "instrument_id": "FU2701",
+      "trading_day": "20261021",
+      "period": "1m",
+      "bar_time": "2026-10-21 11:06:00",
+      "open_price": "4831.000000",
+      "high_price": "4832.000000",
+      "low_price": "4829.000000",
+      "close_price": "4831.000000",
+      "volume": 190474,
+      "turnover": "0.000000",
+      "open_interest": "226662.000000",
+      "open_interest_change": "-829.000000",
+      "provenance_json": "{\"source\": \"sina_history_repair\", \"provider\": \"sina\", \"label_semantics\": \"START\", \"coverage\": \"PARTIAL\", \"requested_at\": \"2026-10-21T03:12:37.890986+00:00\", \"collected_at\": \"2026-10-21T03:12:38.220627+00:00\", \"request_url\": \"https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_=/InnerFuturesNewService.getFewMinLine?symbol=FU2701&type=1\", \"response_sha256\": \"d2762734961686cedad57fe8f3506fa1c9fbc25981877d01eabdc53e3f4e2f03\", \"response_hash_basis\": \"utf8_decoded_text\", \"trading_day_rule\": \"FuturesTradingCalendar.get_trading_day\", \"source_time\": \"2026-10-21 11:07:00\", \"source_role\": \"PRIMARY\", \"retained_fields\": [\"turnover\", \"open_interest_change\", \"volume\"], \"volume_source\": \"sina_tick_aggregate\", \"turnover_source\": \"sina_tick_aggregate\", \"open_interest_change_source\": \"sina_tick_aggregate\"}",
+      "created_at": "2026-10-21 03:07:15"
+    },
+    {
+      "id": 1034575,
+      "instrument_id": "FU2701",
+      "trading_day": "20261021",
+      "period": "5m",
+      "bar_time": "2026-10-21 11:05:00",
+      "open_price": "4829.000000",
+      "high_price": "4833.000000",
+      "low_price": "4826.000000",
+      "close_price": "4828.000000",
+      "volume": 191831,
+      "turnover": "0.000000",
+      "open_interest": "226579.000000",
+      "open_interest_change": "-906.000000",
+      "provenance_json": "{\"source\": \"sina_tick_aggregate\", \"provider\": \"sina\", \"label_semantics\": \"START\", \"coverage\": \"PARTIAL\", \"collected_at\": \"2026-10-21T03:11:15.756330+00:00\", \"trading_day_rule\": \"FuturesTradingCalendar.get_trading_day\"}",
+      "created_at": "2026-10-21 03:11:16"
+    },
+    {
+      "id": 1034766,
+      "instrument_id": "FU2701",
+      "trading_day": "20261021",
+      "period": "30m",
+      "bar_time": "2026-10-21 11:00:00",
+      "open_price": "4829.000000",
+      "high_price": "4833.000000",
+      "low_price": "4820.000000",
+      "close_price": "4824.000000",
+      "volume": 201630,
+      "turnover": "0.000000",
+      "open_interest": "226745.000000",
+      "open_interest_change": "-766.000000",
+      "provenance_json": "{\"source\": \"sina_tick_aggregate\", \"provider\": \"sina\", \"label_semantics\": \"START\", \"coverage\": \"PARTIAL\", \"collected_at\": \"2026-10-21T03:30:00.545996+00:00\", \"trading_day_rule\": \"FuturesTradingCalendar.get_trading_day\"}",
+      "created_at": "2026-10-21 03:30:01"
+    },
+    {
+      "id": 1034767,
+      "instrument_id": "FU2701",
+      "trading_day": "20261021",
+      "period": "60m",
+      "bar_time": "2026-10-21 11:00:00",
+      "open_price": "4829.000000",
+      "high_price": "4833.000000",
+      "low_price": "4820.000000",
+      "close_price": "4824.000000",
+      "volume": 201630,
+      "turnover": "0.000000",
+      "open_interest": "226745.000000",
+      "open_interest_change": "-766.000000",
+      "provenance_json": "{\"source\": \"sina_tick_aggregate\", \"provider\": \"sina\", \"label_semantics\": \"START\", \"coverage\": \"PARTIAL\", \"collected_at\": \"2026-10-21T03:30:00.545996+00:00\", \"trading_day_rule\": \"FuturesTradingCalendar.get_trading_day\"}",
+      "created_at": "2026-10-21 03:30:01"
+    }
+  ],
+  "reason": "Verified restart/collection gap; original exact minute volume unavailable. Raw values preserved.",
+  "cache_updates": 4,
+  "after": [
+    {
+      "period": "1m",
+      "bar_time": "2026-10-21T11:06:00",
+      "raw_volume": 190474,
+      "provenance": {
+        "source": "sina_history_repair",
+        "provider": "sina",
+        "label_semantics": "START",
+        "coverage": "PARTIAL",
+        "requested_at": "2026-10-21T03:12:37.890986+00:00",
+        "collected_at": "2026-10-21T03:12:38.220627+00:00",
+        "request_url": "https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_=/InnerFuturesNewService.getFewMinLine?symbol=FU2701&type=1",
+        "response_sha256": "d2762734961686cedad57fe8f3506fa1c9fbc25981877d01eabdc53e3f4e2f03",
+        "response_hash_basis": "utf8_decoded_text",
+        "trading_day_rule": "FuturesTradingCalendar.get_trading_day",
+        "source_time": "2026-10-21 11:07:00",
+        "source_role": "PRIMARY",
+        "retained_fields": [
+          "turnover",
+          "open_interest_change",
+          "volume"
+        ],
+        "volume_source": "sina_tick_aggregate",
+        "turnover_source": "sina_tick_aggregate",
+        "open_interest_change_source": "sina_tick_aggregate",
+        "volume_quality": "UNVERIFIED_ALLOCATION",
+        "volume_gap": {
+          "affected_minute": "2026-10-21T11:06:00",
+          "raw_stored_volume": 190474,
+          "source_interval": "UNKNOWN",
+          "evidence_note": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.md",
+          "audit_file": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.json"
+        }
+      }
+    },
+    {
+      "period": "5m",
+      "bar_time": "2026-10-21T11:05:00",
+      "raw_volume": 191831,
+      "provenance": {
+        "source": "sina_tick_aggregate",
+        "provider": "sina",
+        "label_semantics": "START",
+        "coverage": "PARTIAL",
+        "collected_at": "2026-10-21T03:11:15.756330+00:00",
+        "trading_day_rule": "FuturesTradingCalendar.get_trading_day",
+        "volume_quality": "UNVERIFIED_ALLOCATION",
+        "volume_gap": {
+          "affected_minute": "2026-10-21T11:06:00",
+          "raw_stored_volume": 191831,
+          "source_interval": "UNKNOWN",
+          "evidence_note": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.md",
+          "audit_file": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.json"
+        }
+      }
+    },
+    {
+      "period": "30m",
+      "bar_time": "2026-10-21T11:00:00",
+      "raw_volume": 201630,
+      "provenance": {
+        "source": "sina_tick_aggregate",
+        "provider": "sina",
+        "label_semantics": "START",
+        "coverage": "PARTIAL",
+        "collected_at": "2026-10-21T03:30:00.545996+00:00",
+        "trading_day_rule": "FuturesTradingCalendar.get_trading_day",
+        "volume_quality": "UNVERIFIED_ALLOCATION",
+        "volume_gap": {
+          "affected_minute": "2026-10-21T11:06:00",
+          "raw_stored_volume": 201630,
+          "source_interval": "UNKNOWN",
+          "evidence_note": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.md",
+          "audit_file": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.json"
+        }
+      }
+    },
+    {
+      "period": "60m",
+      "bar_time": "2026-10-21T11:00:00",
+      "raw_volume": 201630,
+      "provenance": {
+        "source": "sina_tick_aggregate",
+        "provider": "sina",
+        "label_semantics": "START",
+        "coverage": "PARTIAL",
+        "collected_at": "2026-10-21T03:30:00.545996+00:00",
+        "trading_day_rule": "FuturesTradingCalendar.get_trading_day",
+        "volume_quality": "UNVERIFIED_ALLOCATION",
+        "volume_gap": {
+          "affected_minute": "2026-10-21T11:06:00",
+          "raw_stored_volume": 201630,
+          "source_interval": "UNKNOWN",
+          "evidence_note": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.md",
+          "audit_file": "D:\\期货实时交易系统\\docs\\audits\\2026-10-21-FU2701-volume-gap.json"
+        }
+      }
+    }
+  ]
+}

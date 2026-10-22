@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv-mcp/
+venv/
+env/
+
+# 敏感凭据 —— 切勿提交
+.env
+.env.*
+config/settings.yaml
+config/settings.prod.yaml
+config/settings.simnow.yaml
+portable/settings.yaml
+config/session_secret.key
+config/users.yaml
+ctp_flow/
+
+# 运行时
+*.log
+logs/
+backups/
+outputs/
+.workbuddy-ai/
+portable/dist*/
+portable/last_*.txt
+_tmp_*.js
+
+# 数据库 / 缓存
+*.sqlite3
+*.db
+
+# 厂商接口包 — 大体积二进制/SDK, 可从交易所官网重取, 不入库
+接口/
+
+.pytest_cache/
+
+dist/
+
+*.tmp
+
+Thumbs.db
+
+# Private evidence and local one-off verification are not public source assets
+docs/evidence/
+docs/superpowers/validation/
+real_ai_verify.py
+real_ai_verify_result.txt

@@ -1,0 +1,2 @@
+# Isolate from the backend environment: .venv-mcp
+mcp==1.30.0

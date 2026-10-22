@@ -1,0 +1,109 @@
+{
+  "synthetic": true,
+  "quote": {
+    "instrument": "JM2701",
+    "timestamp": "2026-10-19T09:17:00+08:00",
+    "trading_day": "20261019",
+    "last_price": "100",
+    "volume": 100350,
+    "open_interest": "1001"
+  },
+  "checkpoint": {
+    "time": "2026-10-19T09:17:00+08:00",
+    "minute": {
+      "instrument": "JM2701",
+      "period": "1m",
+      "trading_day": "20261019",
+      "bar_time": "2026-10-19T09:17:00+08:00",
+      "open_price": "100",
+      "high_price": "101",
+      "low_price": "99",
+      "close_price": "100",
+      "volume": 50,
+      "open_interest": "1001",
+      "provenance_json": {
+        "provider": "sina",
+        "source": "synthetic_fixture",
+        "label_semantics": "START",
+        "coverage": "PARTIAL"
+      }
+    },
+    "higher": {
+      "15m": {
+        "instrument": "JM2701",
+        "period": "15m",
+        "trading_day": "20261019",
+        "bar_time": "2026-10-19T09:15:00+08:00",
+        "open_price": "100",
+        "high_price": "101",
+        "low_price": "99",
+        "close_price": "100",
+        "volume": 300,
+        "open_interest": "1001",
+        "provenance_json": {
+          "provider": "sina",
+          "source": "synthetic_fixture",
+          "label_semantics": "START",
+          "coverage": "PARTIAL"
+        }
+      }
+    },
+    "volume": 100350,
+    "volume_anchor": {
+      "schema_version": 1,
+      "kind": "LAST_SOURCE_OBSERVATION",
+      "boundary": "BEFORE_PERIOD",
+      "at": "2026-10-19T09:15:00",
+      "value": 100000,
+      "trading_day": "20261019",
+      "source_at": "2026-10-19T09:14:59+08:00",
+      "source_ref": "sha256:fbf1f89ee3b67f279b880331c7289eb252dd031a068b5629da6b4343b8e47a54",
+      "source_record": {
+        "instrument": "JM2701",
+        "timestamp": "2026-10-19T09:14:59+08:00",
+        "trading_day": "20261019",
+        "volume": 100000,
+        "last_price": "100"
+      },
+      "coverage": "PARTIAL"
+    }
+  },
+  "closed_minutes": [
+    {
+      "instrument": "JM2701",
+      "period": "1m",
+      "trading_day": "20261019",
+      "bar_time": "2026-10-19T09:15:00+08:00",
+      "open_price": "100",
+      "high_price": "101",
+      "low_price": "99",
+      "close_price": "100",
+      "volume": 100,
+      "open_interest": "1001",
+      "provenance_json": {
+        "provider": "sina",
+        "source": "synthetic_fixture",
+        "label_semantics": "START",
+        "coverage": "PARTIAL"
+      }
+    },
+    {
+      "instrument": "JM2701",
+      "period": "1m",
+      "trading_day": "20261019",
+      "bar_time": "2026-10-19T09:16:00+08:00",
+      "open_price": "100",
+      "high_price": "101",
+      "low_price": "99",
+      "close_price": "100",
+      "volume": 200,
+      "open_interest": "1001",
+      "provenance_json": {
+        "provider": "sina",
+        "source": "synthetic_fixture",
+        "label_semantics": "START",
+        "coverage": "PARTIAL"
+      }
+    }
+  ]
+}

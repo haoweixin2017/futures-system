@@ -1,0 +1,112 @@
+{
+ "NBS_LATEST_RELEASE": {
+  "enabled": true,
+  "hosts": [
+   "stats.gov.cn"
+  ],
+  "reason": ""
+ },
+ "PBC_NEWS_RELEASE": {
+  "enabled": true,
+  "hosts": [
+   "pbc.gov.cn"
+  ],
+  "reason": ""
+ },
+ "EIA_WPSR_SUMMARY": {
+  "enabled": true,
+  "hosts": [
+   "eia.gov"
+  ],
+  "reason": ""
+ },
+ "SHFE_WAREHOUSE_DAILY": {
+  "enabled": true,
+  "hosts": [
+   "shfe.com.cn",
+   "ine.cn"
+  ],
+  "reason": ""
+ },
+ "DCE_WAREHOUSE_DAILY": {
+  "enabled": true,
+  "hosts": [
+   "dce.com.cn"
+  ],
+  "reason": ""
+ },
+ "CZCE_WAREHOUSE_DAILY": {
+  "enabled": false,
+  "hosts": [
+   "czce.com.cn"
+  ],
+  "reason": "2026-10-05 官方入口及日报正文 HTTP 412/脚本拦截，未取得仓单数据。"
+ },
+ "SCI99": {
+  "enabled": false,
+  "hosts": [
+   "sci99.com"
+  ],
+  "reason": "2026-10-06 最终页面提示暂无当前信息查看权限，登录不代表正文授权；禁止利用初始加载窗口读取。",
+  "evidence": "docs/evidence/2026-10-06-卓创FU-BU权限核验.md"
+ },
+ "CFMMC": {
+  "enabled": false,
+  "hosts": [
+   "cfmmc.com"
+  ],
+  "reason": "尚无已核实可访问且同口径的公开入口，不构造端点。"
+ },
+ "FU_INVENTORY": {
+  "enabled": false,
+  "hosts": [],
+  "reason": "固定入口未核实；可继续公开正文搜索，缺失库存保持 UNKNOWN。"
+ },
+ "FU_IMPORT_SUPPLY": {
+  "enabled": false,
+  "hosts": [],
+  "reason": "2026-10-07 海关统计平台(stats.customs.gov.cn)及海关官网均 HTTP 412/脚本拦截，真实浏览器访问亦空白；按既定规范停止推进。缺失中国进口/国内供应保持 UNKNOWN。证据: docs/evidence/2026-10-07-customs-fuel-oil/"
+ },
+ "FU_BUNKER_DEMAND": {
+  "enabled": false,
+  "hosts": [],
+  "reason": "固定入口未核实；可继续公开正文搜索，缺失船燃需求保持 UNKNOWN。"
+ },
+ "BU_REFINERY_OUTPUT": {
+  "enabled": false,
+  "hosts": [],
+  "reason": "固定入口未核实；可继续公开正文搜索，缺失炼厂开工/产量保持 UNKNOWN。"
+ },
+ "BU_INVENTORY": {
+  "enabled": false,
+  "hosts": [],
+  "reason": "固定入口未核实；可继续公开正文搜索，缺失厂库/社会库存保持 UNKNOWN。"
+ },
+ "BU_ROAD_DEMAND": {
+  "enabled": false,
+  "hosts": [],
+  "reason": "固定入口未核实；可继续公开正文搜索，缺失道路施工需求保持 UNKNOWN。"
+ },
+ "_search_bing": {
+  "enabled": true,
+  "hosts": [
+   "bing.com"
+  ],
+  "reason": ""
+ },
+ "_search_sina": {
+  "enabled": true,
+  "hosts": [
+   "search.sina.com.cn",
+   "finance.sina.com.cn"
+  ],
+  "reason": ""
+ },
+ "_search_eastmoney": {
+  "enabled": true,
+  "hosts": [
+   "eastmoney.com"
+  ],
+  "reason": ""
+ }
+}

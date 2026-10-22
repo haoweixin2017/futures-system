@@ -1,0 +1,206 @@
+{
+  "checked_on": "2026-10-06",
+  "scope": "当前8合约标准规则；不等于合约专项调整公告核验",
+  "calendar_evidence": "official-18.html",
+  "calendar_evidence_scope": "上期所2026年休市安排；其他交易所须保留日历来源限制",
+  "special_notices": [],
+  "rules": [
+    {
+      "product": "FU",
+      "status": "VERIFIED_STANDARD_RULE",
+      "rule_kind": "PREVIOUS_MONTH_LAST_TRADING_DAY",
+      "rule": "合约月份前一月份的最后一个交易日；交易所可以根据国家法定节假日调整最后交易日。",
+      "source_title": "上海期货交易所燃料油期货合约(修订版)",
+      "source_url": "https://www.shfe.com.cn/products/futures/energyandchemical/fu_f/",
+      "source_published_on": "2024-11-13",
+      "rule_verified_on": "2026-10-06",
+      "evidence_file": "official-01.html",
+      "sha256": "9285059b2384c7229d4474684ef0ae3de095a2430552df2aab3d016413e96081",
+      "calendar_years": [
+        2026
+      ],
+      "special_notice_verified": false,
+      "example_last_trading_day_by_rule": "20261030",
+      "available_from": "2026-10-02"
+    },
+    {
+      "product": "BU",
+      "status": "VERIFIED_STANDARD_RULE",
+      "rule_kind": "DELIVERY_MONTH_15_ROLL_FORWARD",
+      "rule": "合约月份的15日（遇国家法定节假日顺延，春节月份等最后交易日交易所可另行调整并通知）",
+      "source_title": "上海期货交易所石油沥青期货合约（修订版）",
+      "source_url": "https://www.shfe.com.cn/products/futures/energyandchemical/bu_f/",
+      "source_published_on": "2024-12-27",
+      "rule_verified_on": "2026-10-06",
+      "evidence_file": "official-02.html",
+      "sha256": "93e65835370115caf07ebc169bb84ee87f4e0d435757417744206b2722737951",
+      "calendar_years": [
+        2026
+      ],
+      "special_notice_verified": false,
+      "example_last_trading_day_by_rule": "20261116",
+      "available_from": "2026-10-06"
+    },
+    {
+      "product": "SC",
+      "status": "VERIFIED_STANDARD_RULE",
+      "rule_kind": "PREVIOUS_MONTH_LAST_TRADING_DAY",
+      "rule": "交割月份前第一月的最后一个交易日；上海国际能源交易中心有权根据国家法定节假日调整最后交易日",
+      "source_title": "上海国际能源交易中心原油期货标准合约",
+      "source_url": "https://www.shfe.com.cn/products/futures/energyandchemical/sc_f/",
+      "source_published_on": null,
+      "rule_verified_on": "2026-10-06",
+      "evidence_file": "official-05.html",
+      "sha256": "f222facce644f4455b8c7a6d9dd147b2983a4e273a13afd73122939a7d513588",
+      "calendar_years": [
+        2026
+      ],
+      "special_notice_verified": false,
+      "example_last_trading_day_by_rule": "20261030",
+      "available_from": "2026-10-06"
+    },
+    {
+      "product": "IH",
+      "status": "VERIFIED_STANDARD_RULE",
+      "rule_kind": "DELIVERY_MONTH_THIRD_FRIDAY_ROLL_FORWARD",
+      "rule": "合约到期月份的第三个周五，遇国家法定假日顺延",
+      "source_title": "上证50股指期货合约表",
+      "source_url": "http://www.cffex.com.cn/cn/sz50gzqh.html",
+      "source_published_on": null,
+      "rule_verified_on": "2026-10-06",
+      "evidence_file": "official-17.html",
+      "sha256": "e926d78cb86fbf35cbe17f1530e31b929bb34b2edd6e494e720ec68ad456bc59",
+      "calendar_years": [
+        2026
+      ],
+      "special_notice_verified": false,
+      "example_last_trading_day_by_rule": "20261016",
+      "available_from": "2026-10-06"
+    },
+    {
+      "product": "SA",
+      "instrument": "SA2701",
+      "status": "VERIFIED_STANDARD_RULE",
+      "rule": "第九条 纯碱期货合约最后交易日为合约交割月份的第10个交易日。",
+      "rule_verified_on": "2026-10-06",
+      "checked_on": "2026-10-06",
+      "calendar_years": [
+        2026
+      ],
+      "special_notice_verified": false,
+      "available_from": "2026-10-06",
+      "rule_kind": "DELIVERY_MONTH_TENTH_TRADING_DAY_BOUND",
+      "source_title": "郑州商品交易所纯碱期货业务细则",
+      "source_url": "https://www.czce.com.cn/cn/flfg/zcjywgz/pzxz/webinfo/2024/02/1708568068815415.htm",
+      "source_published_on": "2024-02-07",
+      "effective_from": "2024-02-06",
+      "verified_at": "2026-10-06T20:46:49.2969952+08:00",
+      "evidence_file": "docs/evidence/2026-10-06-contract-lifecycle/recheck/alternate/SA-desktop-rule.json",
+      "sha256": "194f874e7233be074b703816b5c576bf9e8b9553dcfa541a3173b9ebc4e503b6",
+      "delivery_months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "applies_from_delivery_month": "2024-02",
+      "scope": "仅验证当前具体合约交割月之前的标准期限下界；2027年日历及专项公告未核实"
+    },
+    {
+      "product": "AP",
+      "instrument": "AP2701",
+      "status": "VERIFIED_STANDARD_RULE",
+      "rule": "第九条 苹果期货合约最后交易日为合约交割月份的第10个交易日。",
+      "rule_verified_on": "2026-10-06",
+      "checked_on": "2026-10-06",
+      "calendar_years": [
+        2026
+      ],
+      "special_notice_verified": false,
+      "available_from": "2026-10-06",
+      "rule_kind": "DELIVERY_MONTH_TENTH_TRADING_DAY_BOUND",
+      "source_title": "郑州商品交易所鲜苹果期货业务细则",
+      "source_url": "https://www.czce.com.cn/cn/flfg/zcjywgz/pzxz/webinfo/2025/08/1750864742702425.htm",
+      "source_published_on": "2025-08-29",
+      "effective_from": "2025-08-29",
+      "verified_at": "2026-10-06T20:42:34.3413194+08:00",
+      "evidence_file": "docs/evidence/2026-10-06-contract-lifecycle/recheck/alternate/AP-desktop-rule.json",
+      "sha256": "10b7ab884ede10b2c77213e5db4c7c434524dc7f4c83d7cbe4f11d585c0ccd5d",
+      "delivery_months": [
+        1,
+        3,
+        4,
+        5,
+        10,
+        11,
+        12
+      ],
+      "applies_from_delivery_month": "2026-10",
+      "scope": "仅验证当前具体合约交割月之前的标准期限下界；2027年日历及专项公告未核实"
+    },
+    {
+      "product": "LH",
+      "instrument": "LH2611",
+      "status": "UNKNOWN",
+      "reason": "官方公开页面HTTP 412，未取得标准合约期限原文",
+      "rule": null,
+      "rule_verified_on": null,
+      "checked_on": "2026-10-06",
+      "calendar_years": [
+        2026
+      ],
+      "special_notice_verified": false,
+      "available_from": "2026-10-06"
+    },
+    {
+      "product": "JD",
+      "instrument": "JD2612",
+      "status": "UNKNOWN",
+      "reason": "官方公开页面HTTP 412，未取得标准合约期限原文",
+      "rule": null,
+      "rule_verified_on": null,
+      "checked_on": "2026-10-06",
+      "calendar_years": [
+        2026
+      ],
+      "special_notice_verified": false,
+      "available_from": "2026-10-06"
+    }
+  ],
+  "verified_contracts": [
+    {
+      "instrument": "LH2611",
+      "source_url": "http://www.dce.com.cn/dceapi/forward/publicweb/tradepara/contractInfo",
+      "source_title": "DCE portal contractInfo official contract metadata",
+      "verified_at": "2026-10-06T13:16:40.934144",
+      "last_trading_day": "20261125",
+      "start_trading_day": "20251126",
+      "calendar_years": [
+        2026
+      ],
+      "evidence_file": "docs/evidence/2026-10-06-contract-lifecycle/dce-contract-lh.json",
+      "sha256": "04aca7e82649d58ad5fbf43b9f1717bb4eaa8283cddebdb101902523c0f1d1d2"
+    },
+    {
+      "instrument": "JD2612",
+      "source_url": "http://www.dce.com.cn/dceapi/forward/publicweb/tradepara/contractInfo",
+      "source_title": "DCE portal contractInfo official contract metadata",
+      "verified_at": "2026-10-06T13:16:49.199913",
+      "last_trading_day": "20261228",
+      "start_trading_day": "20251229",
+      "calendar_years": [
+        2026
+      ],
+      "evidence_file": "docs/evidence/2026-10-06-contract-lifecycle/dce-contract-jd.json",
+      "sha256": "0e715d46f2fcc4a49b0f1050c4b93cf961207c2b2e3db436ff70e86de0489542"
+    }
+  ]
+}

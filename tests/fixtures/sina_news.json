@@ -1,0 +1,70 @@
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "list": [
+      {
+        "author": "",
+        "ctime": 1791246600,
+        "dataTime": "1小时前",
+        "dataid": "comos:niufxcp5805524",
+        "docType": "news",
+        "intro": "生意社10月06日讯        10月6日，生意社燃料油基准价为7637.50元/吨，与本月初持平。当日价7637.50日涨幅0.00%一年位置高位最小值5212.50最大值7637.50中位值6425顶位差0底位差2425平均值5975.43警戒1年超涨 2年超涨 3年超涨...",
+        "media": "",
+        "media_show": "生意社",
+        "searchSummary": "生意社10月06日讯        10月6日，生意社燃料油基准价为7637.50元/吨，与本月初持平。当日价7637.50日涨幅0.00%一年位置高位最小值5212.50最大值7637.50中位值6425顶位差0底位差2425平均值5975.43警戒1年超涨 2年超涨 3年超涨...",
+        "source": {
+          "media": ""
+        },
+        "thumb": "https://n.sinaimg.cn/spider20261006/60/w560h300/20261006/6f6c-e1879c5bc2f40c7f20c47f620ebcd7a4.png",
+        "time": "1小时前",
+        "title": "10月6日生意社<font color='red'>燃料油</font>基准价为7637.50元/吨",
+        "type": 1,
+        "url": "https://finance.sina.com.cn/money/future/nyzx/2026-10-06/doc-iniufxcp5805524.shtml?from=pcsearch"
+      },
+      {
+        "author": "",
+        "ctime": 1791160200,
+        "dataTime": "2026-10-05 08:30:00",
+        "dataid": "comos:niucpwm3103420",
+        "docType": "news",
+        "intro": "生意社10月05日讯        10月5日，生意社燃料油380CST基准价为810.00美元/吨，与本月初(828.00美元/吨)相比，下降了2.17%...",
+        "media": "",
+        "media_show": "生意社",
+        "searchSummary": "生意社10月05日讯        10月5日，生意社燃料油380CST基准价为810.00美元/吨，与本月初(828.00美元/吨)相比，下降了2.17%...",
+        "source": {
+          "media": ""
+        },
+        "thumb": "https://n.sinaimg.cn/spider20261005/60/w560h300/20261005/d15d-c28be58d7d190db75c13b508ec5154f5.png",
+        "time": "2026-10-05 08:30:00",
+        "title": "10月5日生意社<font color='red'>燃料油</font>380CST基准价为810.00美元/吨",
+        "type": 1,
+        "url": "https://finance.sina.com.cn/money/future/nyzx/2026-10-05/doc-iniucpwm3103420.shtml?from=pcsearch"
+      },
+      {
+        "author": "",
+        "ctime": 1790901000,
+        "dataTime": "2026-10-02 08:30:00",
+        "dataid": "comos:nitusmp1568497",
+        "docType": "news",
+        "intro": "生意社10月02日讯        10月2日，生意社燃料油基准价为7637.50元/吨，与本月初持平。当日价7637.50日涨幅0.00%一年位置高位最小值5212.50最大值7637.50中位值6425顶位差0底位差2425平均值5951.80警戒1年超涨 2年超涨 3年超涨...",
+        "media": "",
+        "media_show": "生意社",
+        "searchSummary": "生意社10月02日讯        10月2日，生意社燃料油基准价为7637.50元/吨，与本月初持平。当日价7637.50日涨幅0.00%一年位置高位最小值5212.50最大值7637.50中位值6425顶位差0底位差2425平均值5951.80警戒1年超涨 2年超涨 3年超涨...",
+        "source": {
+          "media": ""
+        },
+        "thumb": "https://n.sinaimg.cn/spider20261002/60/w560h300/20261002/acd3-a5d36c24db62455aee35424c73a48a58.png",
+        "time": "2026-10-02 08:30:00",
+        "title": "10月2日生意社<font color='red'>燃料油</font>基准价为7637.50元/吨",
+        "type": 1,
+        "url": "https://finance.sina.com.cn/money/future/nyzx/2026-10-02/doc-initusmp1568497.shtml?from=pcsearch"
+      }
+    ],
+    "total": 8204,
+    "page": 1,
+    "size": 10,
+    "has_more": true,
+    "search_time": 31
+  }
+}

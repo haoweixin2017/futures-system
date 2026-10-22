@@ -1,0 +1,16 @@
+rules:
+  - id: "LONG_WATCH"
+    name: "多头突破观察"
+    timeframe: "15m"
+    conditions:
+      - rule: "BREAK_PREVIOUS_HIGH"
+        desc: "收盘价突破最近20根前高"
+        lookback_bars: 20
+      - rule: "VOLUME_EXPANSION"
+        desc: "成交量达到最近20根均量1.5倍"
+        lookback_bars: 20
+        volume_ratio: 1.5
+      - rule: "OPEN_INTEREST_INCREASE"
+        desc: "持仓量比上一根增加"
+      - rule: "TREND_ALIGNMENT_60M"
+        desc: "60分钟趋势不是明显空头"

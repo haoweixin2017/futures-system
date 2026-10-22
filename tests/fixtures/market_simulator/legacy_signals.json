@@ -1,0 +1,1378 @@
+[
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 70,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 0,
+          "threshold": 100,
+          "ratio": 0.0,
+          "passed": false
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1001.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 70,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 0,
+          "threshold": 100,
+          "ratio": 0.0,
+          "passed": false
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1300.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 70,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 100,
+          "threshold": 100,
+          "ratio": 1.0,
+          "passed": false
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1001.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 70,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 100,
+          "threshold": 100,
+          "ratio": 1.0,
+          "passed": false
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1300.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 80,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 150,
+          "threshold": 100,
+          "ratio": 1.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 999.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": false
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 80,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 150,
+          "threshold": 100,
+          "ratio": 1.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1000.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": false
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 100,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 150,
+          "threshold": 100,
+          "ratio": 1.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1001.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 100,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 150,
+          "threshold": 100,
+          "ratio": 1.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1300.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 80,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 250,
+          "threshold": 100,
+          "ratio": 2.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 999.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": false
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 80,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 250,
+          "threshold": 100,
+          "ratio": 2.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1000.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": false
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 100,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 250,
+          "threshold": 100,
+          "ratio": 2.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1001.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "SHORT_WATCH",
+      "timeframe": "15m",
+      "rule_score": 100,
+      "trigger_price": "98",
+      "invalid_price": "101.10",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_LOW",
+          "current": 98.0,
+          "threshold": 99.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 250,
+          "threshold": 100,
+          "ratio": 2.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1300.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20<=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "OI_SURGE",
+      "timeframe": "15m",
+      "rule_score": 75,
+      "trigger_price": "99",
+      "invalid_price": null,
+      "reasons": [
+        {
+          "rule": "OI_SURGE",
+          "current": 300.0,
+          "threshold": 100.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_CONFIRM",
+          "current": 150,
+          "threshold": 100,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "OI_SURGE",
+      "timeframe": "15m",
+      "rule_score": 75,
+      "trigger_price": "99",
+      "invalid_price": null,
+      "reasons": [
+        {
+          "rule": "OI_SURGE",
+          "current": 300.0,
+          "threshold": 100.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_CONFIRM",
+          "current": 250,
+          "threshold": 100,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "OI_SURGE",
+      "timeframe": "15m",
+      "rule_score": 75,
+      "trigger_price": "100",
+      "invalid_price": null,
+      "reasons": [
+        {
+          "rule": "OI_SURGE",
+          "current": 300.0,
+          "threshold": 100.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_CONFIRM",
+          "current": 150,
+          "threshold": 100,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "OI_SURGE",
+      "timeframe": "15m",
+      "rule_score": 75,
+      "trigger_price": "100",
+      "invalid_price": null,
+      "reasons": [
+        {
+          "rule": "OI_SURGE",
+          "current": 300.0,
+          "threshold": 100.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_CONFIRM",
+          "current": 250,
+          "threshold": 100,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "OI_SURGE",
+      "timeframe": "15m",
+      "rule_score": 75,
+      "trigger_price": "101",
+      "invalid_price": null,
+      "reasons": [
+        {
+          "rule": "OI_SURGE",
+          "current": 300.0,
+          "threshold": 100.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_CONFIRM",
+          "current": 150,
+          "threshold": 100,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "OI_SURGE",
+      "timeframe": "15m",
+      "rule_score": 75,
+      "trigger_price": "101",
+      "invalid_price": null,
+      "reasons": [
+        {
+          "rule": "OI_SURGE",
+          "current": 300.0,
+          "threshold": 100.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_CONFIRM",
+          "current": 250,
+          "threshold": 100,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 70,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 0,
+          "threshold": 100,
+          "ratio": 0.0,
+          "passed": false
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1001.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 70,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 0,
+          "threshold": 100,
+          "ratio": 0.0,
+          "passed": false
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1300.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": null,
+    "saves": 0
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 70,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 100,
+          "threshold": 100,
+          "ratio": 1.0,
+          "passed": false
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1001.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 70,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 100,
+          "threshold": 100,
+          "ratio": 1.0,
+          "passed": false
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1300.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 80,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 150,
+          "threshold": 100,
+          "ratio": 1.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 999.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": false
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 80,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 150,
+          "threshold": 100,
+          "ratio": 1.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1000.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": false
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 100,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 150,
+          "threshold": 100,
+          "ratio": 1.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1001.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 100,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 150,
+          "threshold": 100,
+          "ratio": 1.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1300.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 80,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 250,
+          "threshold": 100,
+          "ratio": 2.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 999.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": false
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 80,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 250,
+          "threshold": 100,
+          "ratio": 2.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1000.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": false
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 100,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 250,
+          "threshold": 100,
+          "ratio": 2.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1001.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  },
+  {
+    "result": {
+      "instrument": "JM2701",
+      "signal": "LONG_WATCH",
+      "timeframe": "15m",
+      "rule_score": 100,
+      "trigger_price": "102",
+      "invalid_price": "98.90",
+      "reasons": [
+        {
+          "rule": "BREAK_PREVIOUS_HIGH",
+          "current": 102.0,
+          "threshold": 101.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "VOLUME_EXPANSION",
+          "current": 250,
+          "threshold": 100,
+          "ratio": 2.5,
+          "passed": true
+        },
+        {
+          "rule": "OPEN_INTEREST_INCREASE",
+          "current": 1300.0,
+          "threshold": 1000.0,
+          "ratio": null,
+          "passed": true
+        },
+        {
+          "rule": "TREND_ALIGNMENT_60M",
+          "current": "EMA20>=EMA60",
+          "threshold": null,
+          "ratio": null,
+          "passed": true
+        }
+      ],
+      "timestamp": "2026-10-19T14:00:00"
+    },
+    "saves": 1
+  }
+]

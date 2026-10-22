@@ -1,0 +1,353 @@
+{
+  "synthetic": false,
+  "captured_at": "2026-10-21T14:48:12.833734+08:00",
+  "quote": {
+    "day_open": "4951.000",
+    "day_high": "5013.000",
+    "day_low": "4578.000",
+    "avg_price": "4796.592",
+    "instrument": "FU2701",
+    "exchange": "SHFE",
+    "trading_day": "20261021",
+    "timestamp": "2026-10-21T14:47:52",
+    "last_price": "4805.000",
+    "bid_price_1": "4803.000",
+    "bid_volume_1": "16",
+    "ask_price_1": "4805.000",
+    "ask_volume_1": "11",
+    "volume": "918808",
+    "turnover": "0.0",
+    "open_interest": "227977.000",
+    "prev_settle": "4928.000",
+    "received_at": "2026-10-21T14:48:10.858861"
+  },
+  "checkpoint": {
+    "minute": {
+      "instrument": "FU2701",
+      "trading_day": "20261021",
+      "period": "1m",
+      "bar_time": "2026-10-21T14:47:00",
+      "open_price": "4794.000",
+      "high_price": "4805.000",
+      "low_price": "4794.000",
+      "close_price": "4805.000",
+      "volume": 692,
+      "turnover": "0.0",
+      "open_interest": "227977.000",
+      "open_interest_change": "-12.000",
+      "provenance_json": {
+        "source": "sina_tick_aggregate",
+        "provider": "sina",
+        "label_semantics": "START",
+        "coverage": "PARTIAL",
+        "collected_at": "2026-10-21T06:48:10.858861+00:00",
+        "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+      }
+    },
+    "volume": 918808,
+    "turnover": "0.0",
+    "oi": "227989.000",
+    "time": "2026-10-21T14:47:52",
+    "closed_until": "2026-10-21T11:30:00",
+    "higher": {
+      "5m": {
+        "instrument": "FU2701",
+        "trading_day": "20261021",
+        "period": "5m",
+        "bar_time": "2026-10-21T14:45:00",
+        "open_price": "4804.000",
+        "high_price": "4805.000",
+        "low_price": "4795.000",
+        "close_price": "4795.000",
+        "volume": 1432,
+        "turnover": "0.0",
+        "open_interest": "227981.000",
+        "open_interest_change": "-50.000",
+        "provenance_json": {
+          "source": "sina_tick_aggregate",
+          "provider": "sina",
+          "label_semantics": "START",
+          "coverage": "PARTIAL",
+          "collected_at": "2026-10-21T06:47:19.911325+00:00",
+          "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+        }
+      },
+      "15m": {
+        "instrument": "FU2701",
+        "trading_day": "20261021",
+        "period": "15m",
+        "bar_time": "2026-10-21T14:45:00",
+        "open_price": "4804.000",
+        "high_price": "4805.000",
+        "low_price": "4795.000",
+        "close_price": "4795.000",
+        "volume": 1432,
+        "turnover": "0.0",
+        "open_interest": "227981.000",
+        "open_interest_change": "-50.000",
+        "provenance_json": {
+          "source": "sina_tick_aggregate",
+          "provider": "sina",
+          "label_semantics": "START",
+          "coverage": "PARTIAL",
+          "collected_at": "2026-10-21T06:47:19.911325+00:00",
+          "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+        }
+      },
+      "30m": {
+        "instrument": "FU2701",
+        "trading_day": "20261021",
+        "period": "30m",
+        "bar_time": "2026-10-21T14:30:00",
+        "open_price": "4812.000",
+        "high_price": "4818.000",
+        "low_price": "4789.000",
+        "close_price": "4795.000",
+        "volume": 15645,
+        "turnover": "0.0",
+        "open_interest": "227981.000",
+        "open_interest_change": "89.000",
+        "provenance_json": {
+          "source": "sina_tick_aggregate",
+          "provider": "sina",
+          "label_semantics": "START",
+          "coverage": "PARTIAL",
+          "collected_at": "2026-10-21T06:47:19.911325+00:00",
+          "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+        }
+      },
+      "60m": {
+        "instrument": "FU2701",
+        "trading_day": "20261021",
+        "period": "60m",
+        "bar_time": "2026-10-21T14:00:00",
+        "open_price": "4801.000",
+        "high_price": "4822.000",
+        "low_price": "4789.000",
+        "close_price": "4795.000",
+        "volume": 35073,
+        "turnover": "0.0",
+        "open_interest": "227981.000",
+        "open_interest_change": "-364.000",
+        "provenance_json": {
+          "source": "sina_tick_aggregate",
+          "provider": "sina",
+          "label_semantics": "START",
+          "coverage": "PARTIAL",
+          "collected_at": "2026-10-21T06:47:19.911325+00:00",
+          "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+        }
+      }
+    },
+    "daily": {
+      "instrument": "FU2701",
+      "trading_day": "20261021",
+      "period": "1d",
+      "bar_time": "2026-10-21T15:00:00",
+      "open_price": "4960.000",
+      "high_price": "5011.000",
+      "low_price": "4579.000",
+      "close_price": "4795.000",
+      "volume": 918116,
+      "turnover": "0.0",
+      "open_interest": "227981.000",
+      "open_interest_change": "-4800.000",
+      "provenance_json": {
+        "source": "sina_tick_aggregate",
+        "provider": "sina",
+        "label_semantics": "DAILY_CLOSE",
+        "coverage": "PARTIAL",
+        "collected_at": "2026-10-21T06:47:19.911325+00:00",
+        "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+      }
+    },
+    "source_observation": {
+      "day_open": "4951.000",
+      "day_high": "5013.000",
+      "day_low": "4578.000",
+      "avg_price": "4796.592",
+      "instrument": "FU2701",
+      "exchange": "SHFE",
+      "trading_day": "20261021",
+      "timestamp": "2026-10-21T14:47:52",
+      "last_price": "4805.000",
+      "bid_price_1": "4803.000",
+      "bid_volume_1": 16,
+      "ask_price_1": "4805.000",
+      "ask_volume_1": 11,
+      "volume": 918808,
+      "turnover": "0.0",
+      "open_interest": "227977.000",
+      "prev_settle": "4928.000"
+    },
+    "volume_anchor": {
+      "schema_version": 1,
+      "kind": "LAST_SOURCE_OBSERVATION",
+      "boundary": "BEFORE_PERIOD",
+      "at": "2026-10-21T14:45:00",
+      "value": 916684,
+      "trading_day": "20261021",
+      "source_at": "2026-10-21T14:44:55",
+      "source_ref": "sha256:eee517c3a79c4f7e8de461c5099f055dfad30f98fbedc024437b39db191590ad",
+      "source_record": {
+        "day_open": "4951.000",
+        "day_high": "5013.000",
+        "day_low": "4578.000",
+        "avg_price": "4796.585",
+        "instrument": "FU2701",
+        "exchange": "SHFE",
+        "trading_day": "20261021",
+        "timestamp": "2026-10-21T14:44:55",
+        "last_price": "4804.000",
+        "bid_price_1": "4804.000",
+        "bid_volume_1": 24,
+        "ask_price_1": "4805.000",
+        "ask_volume_1": 23,
+        "volume": 916684,
+        "turnover": "0.0",
+        "open_interest": "228047.000",
+        "prev_settle": "4928.000"
+      },
+      "coverage": "PARTIAL"
+    }
+  },
+  "closed_minutes": [
+    {
+      "instrument": "FU2701",
+      "trading_day": "20261021",
+      "period": "1m",
+      "bar_time": "2026-10-21T14:45:00+08:00",
+      "open_price": "4804.000000",
+      "high_price": "4805.000000",
+      "low_price": "4801.000000",
+      "close_price": "4801.000000",
+      "volume": 668,
+      "turnover": "0.000000",
+      "open_interest": "228078.000000",
+      "open_interest_change": "48.000000",
+      "provenance_json": {
+        "source": "sina_tick_aggregate",
+        "provider": "sina",
+        "label_semantics": "START",
+        "coverage": "PARTIAL",
+        "collected_at": "2026-10-21T06:46:19.026075+00:00",
+        "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+      },
+      "source_bar_time": "2026-10-21T14:45:00+08:00",
+      "start_at": "2026-10-21T14:45:00+08:00",
+      "end_at": "2026-10-21T14:46:00+08:00"
+    },
+    {
+      "instrument": "FU2701",
+      "trading_day": "20261021",
+      "period": "1m",
+      "bar_time": "2026-10-21T14:46:00+08:00",
+      "open_price": "4801.000000",
+      "high_price": "4801.000000",
+      "low_price": "4795.000000",
+      "close_price": "4795.000000",
+      "volume": 764,
+      "turnover": "0.000000",
+      "open_interest": "227981.000000",
+      "open_interest_change": "-98.000000",
+      "provenance_json": {
+        "source": "sina_tick_aggregate",
+        "provider": "sina",
+        "label_semantics": "START",
+        "coverage": "PARTIAL",
+        "collected_at": "2026-10-21T06:47:19.875982+00:00",
+        "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+      },
+      "source_bar_time": "2026-10-21T14:46:00+08:00",
+      "start_at": "2026-10-21T14:46:00+08:00",
+      "end_at": "2026-10-21T14:47:00+08:00"
+    }
+  ],
+  "observed_bar": {
+    "open_price": "4804.000000",
+    "high_price": "4805.000000",
+    "low_price": "4794.000",
+    "close_price": "4805.000",
+    "volume": 2124,
+    "open_interest": "227977.000",
+    "turnover": null,
+    "instrument": "FU2701",
+    "period": "15m",
+    "trading_day": "20261021",
+    "start_at": "2026-10-21T14:45:00+08:00",
+    "end_at": "2026-10-21T15:00:00+08:00",
+    "provenance_json": {
+      "source": "sina_tick_aggregate",
+      "provider": "sina",
+      "label_semantics": "START",
+      "coverage": "PARTIAL",
+      "collected_at": "2026-10-21T06:48:10.858861+00:00",
+      "trading_day_rule": "FuturesTradingCalendar.get_trading_day"
+    },
+    "coverage": "PARTIAL",
+    "hypothetical": false
+  },
+  "observation_evidence": {
+    "PERIOD_IDENTITY": {
+      "passed": true,
+      "reason": "合约、交易日、小节和周期必须一致",
+      "source_time": "2026-10-21T14:47:52",
+      "source_refs": [
+        "2026-10-21 14:45:00+08:00",
+        "2026-10-21 14:46:00+08:00",
+        "2026-10-21T14:47:00"
+      ]
+    },
+    "FIRST_MINUTE": {
+      "passed": true,
+      "reason": "必须有带可辨来源的周期首分钟观测",
+      "source_time": "2026-10-21T14:47:52",
+      "source_refs": [
+        "2026-10-21 14:45:00+08:00",
+        "2026-10-21 14:46:00+08:00",
+        "2026-10-21T14:47:00"
+      ]
+    },
+    "MINUTE_SEQUENCE": {
+      "passed": true,
+      "reason": "必须逐分钟齐备且不重复",
+      "source_time": "2026-10-21T14:47:52",
+      "source_refs": [
+        "2026-10-21 14:45:00+08:00",
+        "2026-10-21 14:46:00+08:00",
+        "2026-10-21T14:47:00"
+      ]
+    },
+    "VOLUME_ANCHOR": {
+      "passed": true,
+      "reason": "必须有周期前一分钟内同交易日原始累计量观测及哈希；中途启动须等待新周期边界，不能反推",
+      "source_time": "2026-10-21T14:47:52",
+      "source_refs": [
+        "2026-10-21 14:45:00+08:00",
+        "2026-10-21 14:46:00+08:00",
+        "2026-10-21T14:47:00"
+      ]
+    },
+    "OHLC_VOLUME_MATCH": {
+      "passed": true,
+      "reason": "分钟观测与检查点的OHLC和成交量须逐项相同",
+      "source_time": "2026-10-21T14:47:52",
+      "source_refs": [
+        "2026-10-21 14:45:00+08:00",
+        "2026-10-21 14:46:00+08:00",
+        "2026-10-21T14:47:00"
+      ]
+    },
+    "SOURCE_COHERENCE": {
+      "passed": true,
+      "reason": "源时间、末价、累计量及已知持仓须一致，已知总持仓须非负",
+      "source_time": "2026-10-21T14:47:52",
+      "source_refs": [
+        "2026-10-21 14:45:00+08:00",
+        "2026-10-21 14:46:00+08:00",
+        "2026-10-21T14:47:00"
+      ]
+    }
+  },
+  "note": "Actual Sina observations, original pre-period sample and PARTIAL coverage retained. No model or trade calls."
+}

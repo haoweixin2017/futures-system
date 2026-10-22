@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实盘交易 - 国内期货实时监控系统</title>
+    <style>
+        :root {
+            --bg-color: #121418;
+            --card-bg: #1b1e24;
+            --text-color: #e2e8f0;
+            --text-muted: #8492a6;
+            --border-color: #2b303c;
+            --accent-up: #ef4444;
+            --accent-down: #10b981;
+            --warning: #f59e0b;
+            --live-red: #dc2626;
+            --live-border: #451a1a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 12px;
+            font-size: 14px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--live-border);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fca5a5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-tag {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(220, 38, 38, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            font-weight: normal;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #1e293b;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        a.nav-link {
+            text-decoration: none;
+            background: #14202b;
+            color: #7dd3fc;
+            border: 1px solid #0369a1;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        a.nav-link:hover {
+            background: #0369a1;
+            color: #fff;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 12px;
+            align-items: start;
+        }
+        @media (max-width: 1024px) {
+            .grid-container { grid-template-columns: 1fr; }
+        }
+        .panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .panel-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .banner {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .banner.err { background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.4); }
+        .banner.ok { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.4); }
+        .banner.warn { background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.4); color: #fde68a; }
+        .kv { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+        .kv .k { color: var(--text-muted); }
+        .kv .v { font-family: monospace; font-weight: 600; }
+        select, input {
+            width: 100%;
+            background: #232731;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 9px 10px;
+            border-radius: 5px;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        select:focus, input:focus { border-color: #dc2626; }
+        .row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .order-btn {
+            color: #fff; border: none; padding: 10px 0;
+            border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 13px;
+            transition: opacity 0.15s;
+        }
+        .order-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .order-item {
+            background: #232731; border: 1px solid var(--border-color);
+            border-radius: 4px; padding: 7px 9px; margin-bottom: 6px;
+            font-size: 12px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .pos-item {
+            background: #232731; border: 1px solid var(--border-color);
+            border-radius: 4px; padding: 7px 9px; margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .muted { color: var(--text-muted); font-size: 11px; }
+        .risk-list { font-size: 11px; color: var(--text-muted); line-height: 1.8; }
+        .danger-zone {
+            background: rgba(127, 29, 29, 0.15);
+            border: 1px solid rgba(185, 28, 28, 0.4);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 14px;
+        }
+        .danger-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #fca5a5;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 登录遮罩/弹窗 */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 12, 16, 0.88);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 16px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--live-border);
+            border-radius: 12px;
+            padding: 28px 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        .login-title { font-size: 17px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+        .login-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5; }
+        .login-submit-btn {
+            width: 100%;
+            margin-top: 18px;
+            background: var(--live-red);
+            color: #fff;
+            border: none;
+            padding: 11px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .login-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-err {
+            display: none;
+            margin-top: 12px;
+            color: var(--accent-up);
+            font-size: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
+            padding: 8px 10px;
+            line-height: 1.5;
+        }
+        .login-tip {
+            margin-top: 14px;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: #232731;
+            border-radius: 6px;
+            padding: 8px 10px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 实盘账号专属登录弹窗 -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-card">
+            <div class="login-title">实盘交易账号登录</div>
+            <div class="login-sub">CTP柜台直连 · 仅限实盘与管理员账号</div>
+            <form onsubmit="return handleLiveLogin(event)">
+                <label class="muted" style="display:block; margin-bottom:6px;">实盘用户名</label>
+                <input id="login-username" autocomplete="username" maxlength="128" required placeholder="请输入实盘用户名" style="margin-bottom:12px;">
+                <label class="muted" style="display:block; margin-bottom:6px;">交易密码</label>
+                <input id="login-password" type="password" autocomplete="current-password" maxlength="256" required placeholder="请输入密码">
+                <button id="login-submit" class="login-submit-btn" type="submit">立即登录实盘交易</button>
+            </form>
+            <div class="login-err" id="login-error-msg"></div>
+            <div class="login-tip">
+                提示：实盘账号需具备 live / admin 角色且密码非弱密码；模拟账号请前往 <a href="/paper" style="color:#60a5fa; text-decoration:none;">模拟交易页</a>。
+            </div>
+        </div>
+    </div>
+
+    <!-- 顶部状态栏 -->
+    <header>
+        <div class="header-title">
+            <span>实盘交易 · CTP 柜台直连</span>
+            <span class="header-tag">实时生产/仿真</span>
+        </div>
+        <div style="display:flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <div class="status-badge" id="live-state-badge">柜台状态: 检测中...</div>
+            <div class="status-badge" id="user-badge">未登录</div>
+            <a class="nav-link" href="/paper">← 切换至模拟交易页</a>
+        </div>
+    </header>
+
+    <div class="grid-container">
+        <!-- 左侧: 柜台状态、资金账户、持仓与对账信息 -->
+        <div>
+            <!-- CTP 实盘柜台状态 -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>CTP 实盘柜台连接状态</span>
+                    <span style="font-size:11px; color:#3b82f6; cursor:pointer;" onclick="loadLiveStatus()">刷新状态</span>
+                </div>
+                <div id="live-banner" class="banner err">正在检测柜台链路状态...</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px 16px;">
+                    <div class="kv"><span class="k">柜台初始化</span><span class="v" id="st-init">--</span></div>
+                    <div class="kv"><span class="k">前置连接</span><span class="v" id="st-conn">--</span></div>
+                    <div class="kv"><span class="k">穿透认证</span><span class="v" id="st-auth">--</span></div>
+                    <div class="kv"><span class="k">账号登录</span><span class="v" id="st-login">--</span></div>
+                    <div class="kv"><span class="k">结算确认</span><span class="v" id="st-settle">--</span></div>
+                    <div class="kv"><span class="k">账户对账</span><span class="v" id="st-sync">--</span></div>
+                    <div class="kv"><span class="k">交易账号</span><span class="v" id="st-acc">--</span></div>
+                    <div class="kv"><span class="k">服务器时间</span><span class="v" id="st-time">--</span></div>
+                </div>
+            </div>
+
+            <!-- 实盘资金概览 -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>实盘资金账户概览</span>
+                    <span style="font-size:11px; color:#3b82f6; cursor:pointer;" onclick="loadLiveAccount()">刷新资金</span>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px 16px; background:#1e293b; padding:12px; border-radius:6px; margin-bottom:10px;">
+                    <div class="kv" style="margin-bottom:0;"><span class="k">动态静态权益:</span><span id="acc-balance" class="v" style="color:#f87171;">--</span></div>
+                    <div class="kv" style="margin-bottom:0;"><span class="k">可用资金:</span><span id="acc-available" class="v" style="color:#38bdf8;">--</span></div>
+                    <div class="kv" style="margin-bottom:0;"><span class="k">占用保证金:</span><span id="acc-margin" class="v">--</span></div>
+                    <div class="kv" style="margin-bottom:0;"><span class="k">冻结保证金:</span><span id="acc-frozen-margin" class="v">--</span></div>
+                    <div class="kv" style="margin-bottom:0;"><span class="k">平仓累计盈亏:</span><span id="acc-close-profit" class="v">--</span></div>
+                    <div class="kv" style="margin-bottom:0;"><span class="k">出入金变化:</span><span id="acc-deposit-withdraw" class="v">--</span></div>
+                </div>
+            </div>
+
+            <!-- 实盘持仓明细 -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>当前实盘持仓明细</span>
+                    <span style="font-size:11px; color:#3b82f6; cursor:pointer;" onclick="loadLiveAccount()">刷新持仓</span>
+                </div>
+                <div id="live-positions-list" style="max-height:180px; overflow-y:auto;">
+                    <div class="muted">暂无实盘持仓</div>
+                </div>
+            </div>
+
+            <!-- 实盘最近成交记录 -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>实盘最近成交流水</span>
+                    <span style="font-size:11px; color:#3b82f6; cursor:pointer;" onclick="loadLiveAccount()">刷新成交</span>
+                </div>
+                <div id="live-trades-list" style="max-height:160px; overflow-y:auto;">
+                    <div class="muted">暂无成交流水</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧: 快速报单、活跃委托、风控与紧急停机 -->
+        <div>
+            <!-- 实盘快速报单 -->
+            <div class="panel">
+                <div class="panel-title">实盘报单交易</div>
+                <label class="muted" style="display:block; margin-bottom:4px;">标的合约 (来自自选订阅池)</label>
+                <select id="live-symbol" style="margin-bottom:8px;"></select>
+
+                <div class="kv" style="margin-bottom:8px;">
+                    <span class="k">当前最新价</span>
+                    <span class="v" id="live-last" style="font-size:14px; color:#f87171;">--</span>
+                </div>
+
+                <div class="row" style="margin-bottom:8px;">
+                    <select id="live-price-mode" aria-label="价格模式" onchange="changePriceMode()" style="width:90px;">
+                        <option value="limit">限价</option>
+                        <option value="opponent">对手价</option>
+                    </select>
+                    <input id="live-price" type="number" min="0.000001" step="any" placeholder="委托价格" style="flex:1;">
+                    <input id="live-vol" type="number" min="1" max="50" step="1" value="1" placeholder="手数" style="width:75px;">
+                </div>
+
+                <!-- 快速一键报单 (对齐模拟盘操作区) -->
+                <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">一键快速报单：</div>
+                <div class="btn-grid">
+                    <button class="order-btn" id="btn-quick-buy-open" style="background:#dc2626;" onclick="liveQuickOrder('BUY','OPEN',true)">对手价买开(多)</button>
+                    <button class="order-btn" id="btn-quick-sell-open" style="background:#16a34a;" onclick="liveQuickOrder('SELL','OPEN',true)">对手价卖开(空)</button>
+                </div>
+                <div class="btn-grid">
+                    <button class="order-btn" id="btn-buy-open" style="background:#dc2626;" onclick="liveOrder('BUY','OPEN')">买开 (做多)</button>
+                    <button class="order-btn" id="btn-sell-open" style="background:#16a34a;" onclick="liveOrder('SELL','OPEN')">卖开 (做空)</button>
+                </div>
+                <div class="btn-grid">
+                    <button class="order-btn" id="btn-sell-close" style="background:#ef4444; opacity:0.9;" onclick="liveOrder('SELL','CLOSE')">卖平 (平多仓)</button>
+                    <button class="order-btn" id="btn-buy-close" style="background:#22c55e; opacity:0.9;" onclick="liveOrder('BUY','CLOSE')">买平 (平空仓)</button>
+                </div>
+
+                <div class="risk-list" style="margin-top:8px;">
+                    规则约束: 强制事前硬风控，单笔上限 50 手，柜台未就绪时拒绝入场。
+                </div>
+            </div>
+
+            <!-- 实盘活跃挂单与委托历史 -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>实盘活动挂单 / 委托流水</span>
+                    <span style="font-size:11px; color:#3b82f6; cursor:pointer;" onclick="loadLiveOrders()">刷新</span>
+                </div>
+                <div id="live-orders" style="max-height:220px; overflow-y:auto;">
+                    <div class="muted">暂无实盘委托</div>
+                </div>
+            </div>
+
+            <!-- 实盘安全与紧急停机控制区 (从软到硬三级停机) -->
+            <div class="panel danger-zone">
+                <div class="danger-title">
+                    <span>⚠ 实盘应急控制开关 (安全熔断)</span>
+                </div>
+                <div class="risk-list" style="margin-bottom:8px; color:#fca5a5;">
+                    从软到硬三级干预：开关1禁止新开仓；开关2批量撤销挂单；开关3一键紧急全平。
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:6px;">
+                    <button id="btn-block-open" onclick="toggleBlockOpen()" style="background:#b45309; color:#fff; border:none; padding:7px 4px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">
+                        软开关: 禁止新开仓
+                    </button>
+                    <button id="btn-cancel-all" onclick="emergencyCancelAll()" style="background:#991b1b; color:#fff; border:none; padding:7px 4px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold;">
+                        中开关: 撤销全部挂单
+                    </button>
+                </div>
+                <div>
+                    <button id="btn-close-all" onclick="emergencyCloseAllLive()" style="width:100%; background:#7f1d1d; color:#fecaca; border:1px solid #b91c1c; padding:8px 4px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">
+                        硬开关: 一键紧急全平所有实盘持仓
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let liveReady = false;
+        let isOpenBlocked = false;
+        let ws = null;
+        let refreshTimersStarted = false;
+        const quotes = {};   // symbol -> last_price
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[ch]);
+        }
+
+        function safeInlineValue(value) {
+            return encodeURIComponent(String(value ?? '')).replace(/'/g, '%27');
+        }
+
+        // 页面初始化
+        window.onload = async () => {
+            const authed = await initUser();
+            if (!authed) return;
+            await startDashboard();
+        };
+
+        async function startDashboard() {
+            await loadWatchlist();
+            await loadLiveStatus();
+            await loadLiveAccount();
+            await loadLiveOrders();
+            connectWebSocket();
+
+            // 定时轮询状态与交易数据 (对齐模拟盘 3-5 秒轮询规则)
+            if (!refreshTimersStarted) {
+                refreshTimersStarted = true;
+                setInterval(loadLiveStatus, 5000);
+                setInterval(loadLiveAccount, 4000);
+                setInterval(loadLiveOrders, 3000);
+            }
+        }
+
+        // 登录状态初始化与权限校验
+        async function initUser() {
+            try {
+                const res = await fetch('/api/v1/auth/me');
+                if (res.status === 401) {
+                    showLoginOverlay(true);
+                    return false;
+                }
+                const data = await res.json();
+                currentUser = data.user;
+            } catch (e) {
+                showLoginOverlay(true);
+                return false;
+            }
+
+            if (!currentUser.can_live_trade) {
+                alert('当前账号为模拟用户，无权进入实盘交易系统。即将为您跳转至模拟交易页。');
+                window.location.href = '/paper';
+                return false;
+            }
+
+            showLoginOverlay(false);
+            renderUserBadge();
+            return true;
+        }
+
+        function showLoginOverlay(show) {
+            const overlay = document.getElementById('login-overlay');
+            if (overlay) overlay.style.display = show ? 'flex' : 'none';
+            if (show) {
+                try {
+                    const remembered = localStorage.getItem('cfs_username_live') || '';
+                    if (remembered) {
+                        document.getElementById('login-username').value = remembered;
+                        document.getElementById('login-password').focus();
+                    } else {
+                        document.getElementById('login-username').focus();
+                    }
+                } catch (e) {}
+            }
+        }
+
+        async function handleLiveLogin(event) {
+            event.preventDefault();
+            const btn = document.getElementById('login-submit');
+            const errBox = document.getElementById('login-error-msg');
+            errBox.style.display = 'none';
+
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!username || !password) {
+                errBox.innerText = '请输入用户名和密码';
+                errBox.style.display = 'block';
+                return false;
+            }
+
+            btn.disabled = true;
+            btn.innerText = '正在验证实盘身份...';
+
+            try {
+                const res = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, expected_role: 'live' })
+                });
+
+                if (res.ok) {
+                    try { localStorage.setItem('cfs_username_live', username); } catch (e) {}
+                    const authed = await initUser();
+                    if (authed) await startDashboard();
+                    return false;
+                }
+
+                const data = await res.json().catch(() => ({}));
+                errBox.innerText = data.detail || '登录失败，请检查账号密码';
+                errBox.style.display = 'block';
+            } catch (e) {
+                errBox.innerText = '网络异常，无法连接服务';
+                errBox.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '立即登录实盘交易';
+            }
+            return false;
+        }
+
+        function renderUserBadge() {
+            const badge = document.getElementById('user-badge');
+            if (!badge || !currentUser) return;
+            const roleText = { sim: '模拟用户', live: '正式用户', admin: '管理员' }[currentUser.role] || currentUser.role;
+            const roleLabel = currentUser.display_name === roleText ? roleText : `${currentUser.display_name} · ${roleText}`;
+            badge.innerHTML = `<span style="color:#f87171; font-weight:bold;">${roleLabel}</span>` +
+                ` <span onclick="logout()" style="cursor:pointer; color:#ef4444; margin-left:6px;">退出</span>`;
+        }
+
+        async function logout() {
+            try { await fetch('/api/v1/auth/logout', { method: 'POST' }); } catch (e) {}
+            window.location.href = '/login';
+        }
+
+        function mark(ok) {
+            return `<span style="color:${ok ? '#10b981' : '#ef4444'}; font-weight:bold;">${ok ? '● 正常' : '● 未就绪'}</span>`;
+        }
+
+        // 加载 CTP 柜台运行状态
+        async function loadLiveStatus() {
+            try {
+                const res = await fetch('/api/v1/trade/live/status');
+                if (res.status === 401) { showLoginOverlay(true); return; }
+                if (res.status === 403) { window.location.href = '/paper'; return; }
+                const s = await res.json();
+                liveReady = !!s.ready;
+
+                document.getElementById('st-init').innerHTML = mark(s.initialized);
+                document.getElementById('st-conn').innerHTML = mark(s.connected);
+                document.getElementById('st-auth').innerHTML = mark(s.authenticated);
+                document.getElementById('st-login').innerHTML = mark(s.logged_in);
+                document.getElementById('st-settle').innerHTML = mark(s.settlement_confirmed);
+                document.getElementById('st-sync').innerHTML = mark(s.reconciled);
+                document.getElementById('st-acc').innerText = s.account || '--';
+                document.getElementById('st-time').innerText = s.server_time || '--';
+
+                const badge = document.getElementById('live-state-badge');
+                const banner = document.getElementById('live-banner');
+                if (liveReady) {
+                    badge.innerHTML = '<span style="color:#10b981;">●</span> 实盘柜台就绪';
+                    banner.className = 'banner ok';
+                    banner.innerHTML = `<span style="color:#10b981; font-weight:bold;">CTP 实盘柜台已连接并完成对账</span><br>` +
+                        `<span class="muted">当前交易账号: ${s.account}。报单直通交易所，已开启全套事前硬风控防护。</span>`;
+                } else {
+                    badge.innerHTML = '<span style="color:#ef4444;">●</span> 柜台不可报单';
+                    banner.className = 'banner err';
+                    banner.textContent = s.blocking_reason || s.sync_error || '柜台尚未完成连接、结算确认和对账，实盘报单已锁定。';
+                }
+
+                // 更新下单按钮可点击状态
+                ['btn-buy-open', 'btn-sell-open', 'btn-sell-close', 'btn-buy-close', 'btn-quick-buy-open', 'btn-quick-sell-open'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.disabled = !liveReady;
+                });
+            } catch (e) {
+                const banner = document.getElementById('live-banner');
+                if (banner) banner.innerHTML = '<span style="color:#ef4444;">柜台状态请求失败</span>';
+                liveReady = false;
+            }
+
+            // 同步检查风控开仓开关状态
+            checkRiskStatus();
+        }
+
+        async function checkRiskStatus() {
+            try {
+                const res = await fetch('/api/v1/trade/live/risk');
+                if (res.ok) {
+                    const data = await res.json();
+                    isOpenBlocked = !!data.open_blocked;
+                    const btn = document.getElementById('btn-block-open');
+                    if (btn) {
+                        btn.innerText = isOpenBlocked ? '软开关: 恢复允许开仓' : '软开关: 禁止新开仓';
+                        btn.style.background = isOpenBlocked ? '#15803d' : '#b45309';
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // 加载合约池
+        async function loadWatchlist() {
+            try {
+                const res = await fetch('/api/v1/watchlist');
+                if (!res.ok) return;
+                const data = await res.json();
+                const sel = document.getElementById('live-symbol');
+                const list = data.watchlist || [];
+                const curVal = sel.value;
+                list.forEach(w => {
+                    if (w.last_price != null) quotes[w.symbol] = w.last_price;
+                });
+                sel.innerHTML = list.map(w =>
+                    `<option value="${escapeHTML(w.symbol)}">${escapeHTML(w.symbol)} ${escapeHTML(w.name || '')} ${w.last_price != null ? '@ ' + escapeHTML(w.last_price) : ''}</option>`
+                ).join('') || '<option value="">暂无订阅合约</option>';
+
+                if (curVal && list.some(w => w.symbol === curVal)) {
+                    sel.value = curVal;
+                }
+                sel.onchange = () => updateLastPrice();
+                updateLastPrice();
+            } catch (e) {}
+        }
+
+        function updateLastPrice() {
+            const sym = document.getElementById('live-symbol').value;
+            const p = quotes[sym];
+            const el = document.getElementById('live-last');
+            if (el) el.innerText = p != null ? p : '--';
+            const priceInput = document.getElementById('live-price');
+            const mode = document.getElementById('live-price-mode').value;
+            if (mode === 'opponent' && p != null && priceInput) {
+                priceInput.value = p;
+            }
+        }
+
+        function changePriceMode() {
+            const mode = document.getElementById('live-price-mode').value;
+            const priceInput = document.getElementById('live-price');
+            if (mode === 'opponent') {
+                priceInput.disabled = true;
+                priceInput.value = '';
+                priceInput.placeholder = '买取卖一 · 卖取买一';
+            } else {
+                priceInput.disabled = false;
+                priceInput.placeholder = '委托价格';
+            }
+        }
+
+        function opponentPrice(quote, direction) {
+            const price = quote[direction === 'BUY' ? 'ask_price_1' : 'bid_price_1'];
+            if (!price || !Number.isFinite(Number(price)) || Number(price) <= 0) {
+                throw new Error(direction === 'BUY' ? '暂无卖一报价，无法使用对手价' : '暂无买一报价，无法使用对手价');
+            }
+            return String(price);
+        }
+
+        async function fetchOpponentPrice(instrument, direction) {
+            const response = await fetch('/api/v1/quotes/' + encodeURIComponent(instrument));
+            if (!response.ok) throw new Error('无法获取当前买卖报价');
+            const quote = await response.json();
+            const quoteTime = Date.parse(quote.timestamp);
+            if (!Number.isFinite(quoteTime) || Date.now() - quoteTime > 15000) {
+                throw new Error('报价已过期，请等待实时行情更新');
+            }
+            return opponentPrice(quote, direction);
+        }
+
+        // 加载实盘资金与持仓
+        async function loadLiveAccount() {
+            try {
+                const res = await fetch('/api/v1/trade/live/account');
+                if (res.status === 401) { showLoginOverlay(true); return; }
+                if (res.status === 403) { window.location.href = '/paper'; return; }
+                if (!res.ok) return;
+                const snap = await res.json();
+
+                // 渲染资金
+                const accList = snap.account || [];
+                if (accList.length > 0) {
+                    const a = accList[0];
+                    const fmt = n => parseFloat(n || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    document.getElementById('acc-balance').innerText = '￥ ' + fmt(a.Balance);
+                    document.getElementById('acc-available').innerText = '￥ ' + fmt(a.Available);
+                    document.getElementById('acc-margin').innerText = '￥ ' + fmt(a.CurrMargin);
+                    document.getElementById('acc-frozen-margin').innerText = '￥ ' + fmt(a.FrozenMargin);
+                    document.getElementById('acc-close-profit').innerText = '￥ ' + fmt(a.CloseProfit);
+                    const dep = parseFloat(a.Deposit || 0);
+                    const wth = parseFloat(a.Withdraw || 0);
+                    document.getElementById('acc-deposit-withdraw').innerText = `入 ${fmt(dep)} / 出 ${fmt(wth)}`;
+                }
+
+                // 渲染持仓明细
+                const posList = snap.positions || [];
+                const posBox = document.getElementById('live-positions-list');
+                if (!posList.length) {
+                    posBox.innerHTML = '<div class="muted">暂无实盘持仓</div>';
+                } else {
+                    posBox.innerHTML = posList.map(p => {
+                        const isBuy = p.PosiDirection === '2';
+                        const dirText = isBuy ? '多' : '空';
+                        const dirColor = isBuy ? '#ef4444' : '#10b981';
+                        const vol = p.Position || 0;
+                        const frozen = isBuy ? (p.ShortFrozen || 0) : (p.LongFrozen || 0);
+                        return `<div class="pos-item">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                                <span style="font-weight:bold;">${escapeHTML(p.InstrumentID)}</span>
+                                <span style="color:${dirColor}; font-weight:bold;">${dirText}仓 ${vol}手 (冻结 ${frozen})</span>
+                            </div>
+                            <div class="muted" style="display:flex; justify-content:space-between;">
+                                <span>开仓均价: ${p.OpenCost ? (p.OpenCost / (vol || 1)).toFixed(1) : '--'}</span>
+                                <span>占用保证金: ￥${parseFloat(p.UseMargin || 0).toFixed(1)}</span>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+                // 渲染最近成交
+                const tradeList = snap.trades || [];
+                const tradeBox = document.getElementById('live-trades-list');
+                if (!tradeList.length) {
+                    tradeBox.innerHTML = '<div class="muted">暂无成交流水</div>';
+                } else {
+                    tradeBox.innerHTML = tradeList.slice(-8).reverse().map(t => {
+                        const isBuy = t.Direction === '0';
+                        const dirText = isBuy ? '买' : '卖';
+                        const offText = t.OffsetFlag === '0' ? '开' : '平';
+                        const color = isBuy ? '#ef4444' : '#10b981';
+                        return `<div class="order-item">
+                            <div>
+                                <span style="color:${color}; font-weight:bold;">[${dirText}${offText}]</span>
+                                <span>${escapeHTML(t.InstrumentID)}</span>
+                                <span>${escapeHTML(t.Volume)}手 @ ${escapeHTML(t.Price)}</span>
+                            </div>
+                            <div class="muted">${escapeHTML(t.TradeTime || '')}</div>
+                        </div>`;
+                    }).join('');
+                }
+            } catch (e) {}
+        }
+
+        // 加载实盘活跃委托
+        async function loadLiveOrders() {
+            try {
+                const res = await fetch('/api/v1/trade/live/orders');
+                if (res.status === 401) { showLoginOverlay(true); return; }
+                if (res.status === 403) { window.location.href = '/paper'; return; }
+                if (!res.ok) return;
+                const data = await res.json();
+                const box = document.getElementById('live-orders');
+                const orders = data.orders || [];
+                if (!orders.length) {
+                    box.innerHTML = '<div class="muted">暂无实盘委托</div>';
+                    return;
+                }
+
+                box.innerHTML = orders.slice(0, 15).map(o => {
+                    const dirText = o.direction === 'BUY' ? '买' : '卖';
+                    const offText = o.offset === 'OPEN' ? '开' : '平';
+                    const color = o.status === 'REJECTED' ? '#ef4444' : (o.status === 'CANCELLING' ? '#f59e0b' : '#10b981');
+                    const canCancel = ['SUBMITTED', 'PARTIAL'].includes(o.status);
+                    const cancelBtn = canCancel
+                        ? `<button onclick="cancelLiveOrder(decodeURIComponent('${safeInlineValue(o.order_ref)}'))" style="background:#dc2626; color:#fff; border:none; border-radius:3px; padding:2px 8px; font-size:11px; cursor:pointer;">撤单</button>`
+                        : '';
+                    return `<div class="order-item">
+                        <div>
+                            <span style="color:${color}; font-weight:bold;">[${escapeHTML(o.status)}]</span>
+                            <span>${escapeHTML(o.instrument)}</span>
+                            <span>${dirText}${offText} ${escapeHTML(o.volume)}手 @ ${escapeHTML(o.price)}</span>
+                            ${o.reject_reason ? `<div style="color:#ef4444; font-size:10px;">${escapeHTML(o.reject_reason)}</div>` : ''}
+                        </div>
+                        <div>${cancelBtn}</div>
+                    </div>`;
+                }).join('');
+            } catch (e) {}
+        }
+
+        // 实盘撤单
+        async function cancelLiveOrder(orderRef) {
+            if (!confirm('确定要撤销该笔实盘委托吗？')) return;
+            try {
+                const res = await fetch('/api/v1/trade/live/order/' + encodeURIComponent(orderRef), { method: 'DELETE' });
+                if (res.status === 401) { showLoginOverlay(true); return; }
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    alert('撤单失败: ' + (err.detail || '未知错误'));
+                }
+                await loadLiveOrders();
+            } catch (e) {
+                alert('撤单请求异常: ' + e);
+            }
+        }
+
+        // 实盘下单
+        async function liveOrder(direction, offset) {
+            const sym = document.getElementById('live-symbol').value;
+            const volumeText = document.getElementById('live-vol').value.trim();
+            const vol = Number(volumeText);
+            let price = document.getElementById('live-price').value.trim();
+
+            if (!sym) { alert('请先选择有效合约'); return; }
+            if (!/^\d+$/.test(volumeText) || !Number.isInteger(vol) || vol < 1 || vol > 50) {
+                alert('请输入 1 到 50 之间的整数手数');
+                return;
+            }
+
+            const mode = document.getElementById('live-price-mode').value;
+            if (mode === 'opponent') {
+                try {
+                    price = await fetchOpponentPrice(sym, direction);
+                } catch (e) {
+                    alert(e.message);
+                    return;
+                }
+            } else if (!price || !Number.isFinite(Number(price)) || Number(price) <= 0) {
+                alert('请输入大于 0 的有效委托价格');
+                return;
+            }
+
+            if (!liveReady) {
+                alert('实盘柜台尚未就绪，系统拒绝发送报单！');
+                return;
+            }
+
+            const dirName = direction === 'BUY' ? '买' : '卖';
+            const offName = offset === 'OPEN' ? '开仓' : '平仓';
+            const msg = `【CTP 实盘报单安全确认】\n\n合约：${sym}\n方向：${dirName}${offName}\n价格：${price}\n手数：${vol} 手\n\n此指令将直接发送至期货交易所并撮合成交，是否确认发送？`;
+            if (!confirm(msg)) return;
+
+            try {
+                const res = await fetch('/api/v1/trade/live/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        instrument: sym,
+                        direction: direction,
+                        offset: offset,
+                        price: price,
+                        volume: vol
+                    })
+                });
+
+                if (res.status === 401) { showLoginOverlay(true); return; }
+                if (res.status === 403) {
+                    const err = await res.json().catch(() => ({}));
+                    alert('权限受限: ' + (err.detail || '无实盘权限或存在密码安全约束'));
+                    return;
+                }
+
+                const result = await res.json();
+                if (!res.ok) {
+                    alert('报单失败: ' + (result.detail || '参数无效'));
+                    return;
+                }
+
+                if (result.order?.status === 'UNKNOWN') {
+                    alert('报单状态不确定，请等待柜台对账确认，严禁重复下单！');
+                } else if (result.status === 'rejected') {
+                    alert('实盘报单被风控拦截/拒绝:\n' + (result.order?.reject_reason || '未知原因'));
+                } else {
+                    alert('实盘报单已成功报送柜台，委托编号: ' + (result.order?.order_ref || '--'));
+                }
+
+                await loadLiveOrders();
+                await loadLiveAccount();
+            } catch (e) {
+                alert('实盘报单网络错误: ' + e);
+            }
+        }
+
+        // 快速一键对手价报单
+        function liveQuickOrder(direction, offset, isOpponent) {
+            if (isOpponent) {
+                document.getElementById('live-price-mode').value = 'opponent';
+                changePriceMode();
+            }
+            liveOrder(direction, offset);
+        }
+
+        // 开关 1 (软): 禁止新开仓
+        async function toggleBlockOpen() {
+            const endpoint = isOpenBlocked ? '/api/v1/trade/live/unblock-open' : '/api/v1/trade/live/block-open';
+            const actionText = isOpenBlocked ? '恢复允许开仓' : '禁止新开仓';
+            if (!confirm(`确认执行【${actionText}】操作吗？`)) return;
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: '人工操作控制' })
+                });
+                if (res.ok) {
+                    alert(`操作成功: 已${actionText}`);
+                    await checkRiskStatus();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert('操作失败: ' + (err.detail || '未知原因'));
+                }
+            } catch (e) {
+                alert('网络异常: ' + e);
+            }
+        }
+
+        // 开关 2 (中): 批量撤销全部挂单
+        async function emergencyCancelAll() {
+            const token = prompt('【实盘安全停机】批量撤单需输入运维安全令牌 (X-Admin-Token)：');
+            if (token === null) return;
+            if (!confirm('警告：即将撤销当前所有的实盘活动挂单，是否继续？')) return;
+
+            try {
+                const res = await fetch('/api/v1/trade/live/cancel-all', {
+                    method: 'POST',
+                    headers: { 'X-Admin-Token': token.trim() }
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    alert(`批量撤单已完成:\n已尝试: ${result.attempted} 笔\n已提交: ${result.submitted} 笔`);
+                    await loadLiveOrders();
+                } else {
+                    alert('批量撤单失败: ' + (result.detail || '令牌无效或密码不合规'));
+                }
+            } catch (e) {
+                alert('网络异常: ' + e);
+            }
+        }
+
+        // 开关 3 (硬): 一键紧急全平所有实盘持仓
+        async function emergencyCloseAllLive() {
+            const token = prompt('【高危操作：实盘一键全平】请输入运维安全令牌 (X-Admin-Token)：');
+            if (token === null) return;
+            const confirmStr = prompt('为防止误触，请手动输入确认口令：CONFIRM_CLOSE_ALL');
+            if (confirmStr !== 'CONFIRM_CLOSE_ALL') {
+                alert('口令输入不正确，已取消全平操作。');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/v1/trade/live/close-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': token.trim()
+                    },
+                    body: JSON.stringify({
+                        confirm: 'CONFIRM_CLOSE_ALL',
+                        reason: '前端人工一键紧急全平'
+                    })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    alert(`实盘全平指令已送出:\n撤销挂单: ${result.cancelled || 0} 笔\n平仓委托: ${(result.closed || []).length} 笔\n错误数: ${(result.errors || []).length} 笔`);
+                    await loadLiveOrders();
+                    await loadLiveAccount();
+                } else {
+                    alert('一键全平失败: ' + (result.detail || '令牌错误或拒绝执行'));
+                }
+            } catch (e) {
+                alert('网络异常: ' + e);
+            }
+        }
+
+        // 行情 WebSocket 监听
+        function connectWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) return;
+            const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${proto}//${window.location.host}/api/v1/ws/market`);
+            ws.onmessage = (evt) => {
+                try {
+                    const msg = JSON.parse(evt.data);
+                    if (msg.event === "TICK") {
+                        const t = msg.data;
+                        quotes[t.instrument] = t.last_price;
+                        const sel = document.getElementById('live-symbol');
+                        if (sel && sel.value === t.instrument) {
+                            const lastEl = document.getElementById('live-last');
+                            if (lastEl) lastEl.innerText = t.last_price;
+                            const modeEl = document.getElementById('live-price-mode');
+                            if (modeEl && modeEl.value === 'opponent') {
+                                const pInput = document.getElementById('live-price');
+                                if (pInput) pInput.value = t.last_price;
+                            }
+                        }
+                    }
+                } catch (e) {}
+            };
+            ws.onclose = () => {
+                ws = null;
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+    </script>
+</body>
+</html>

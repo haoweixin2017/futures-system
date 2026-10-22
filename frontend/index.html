@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易工作台 - 国内期货实时监控系统</title>
+    <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        :root {
+            --bg-color: #121418;
+            --card-bg: #1b1e24;
+            --text-color: #e2e8f0;
+            --text-muted: #8492a6;
+            --accent-up: #ef4444;
+            --accent-down: #10b981;
+            --border-color: #2b303c;
+            --active-tab: #2563eb;
+            --warning-color: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 12px;
+            font-size: 14px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 8px;
+            position: relative;   /* 顶部全市场搜索框绝对居中 */
+        }
+        .header-title { font-size: 16px; font-weight: bold; color: #fff; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #1e293b;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
+        .dot-ws { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
+        .dot-ws.connected { background: #10b981; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 260px 1fr 340px;
+            gap: 12px;
+            height: calc(100vh - 84px);
+        }
+        @media (max-width: 1024px) {
+            .grid-container { grid-template-columns: 1fr; height: auto; }
+        }
+        @media (max-width: 720px) {
+            /* 窄屏: 顶部全市场搜索框整行铺满。
+               桌面宽度下它在 header flex 流内占 340px; 窄屏放不下, 允许换行铺满一行。 */
+            header { flex-wrap: wrap; row-gap: 8px; }
+            #universe-top {
+                width: 100% !important;
+            }
+            .chart-controls { flex-wrap: wrap !important; }
+        }
+        .panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .panel-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .group-header {
+            font-size: 11px;
+            color: var(--text-muted);
+            padding: 4px 2px 6px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 6px;
+        }
+        .group-body {
+            max-height: 462px;   /* 恰好显示 5 张合约卡片, 其余组内滚动 */
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .group-tab {
+            padding: 3px 10px;
+            background: #1b1e24;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .group-tab.active {
+            background: #1e3a5f;
+            border-color: #3b82f6;
+            color: #fff;
+        }
+        .group-tab.drag-over {
+            border-color: #3b82f6 !important;
+            color: #3b82f6;
+        }
+        .contract-item {
+            padding: 10px;
+            border-radius: 6px;
+            background: #232731;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .contract-item[draggable="true"] { cursor: grab; }
+        .contract-item.dragging, .group-header.dragging { opacity: 0.4; }
+        .contract-item.drag-over, .group-header.drag-over { border-color: #3b82f6 !important; }
+        .group-header[draggable="true"] { cursor: grab; }
+        .contract-item.active {
+            border-color: var(--active-tab);
+            background: #1e293b;
+        }
+        .contract-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; margin-bottom: 4px; }
+        .contract-symbol { font-weight: bold; font-size: 15px; flex: 1 1 auto; min-width: 0; word-break: break-all; line-height: 1.25; }
+        .price-val { font-family: monospace; font-size: 15px; font-weight: 600; flex-shrink: 0; white-space: nowrap; }
+        .contract-badge { flex-shrink: 0; white-space: nowrap; }
+        /* 涨跌金额 + 幅度: 与价格同宽右对齐, 等宽字体保证竖列对齐 */
+        .chg-val { font-family: monospace; font-size: 11px; font-weight: 600; flex-shrink: 0; white-space: nowrap; }
+        .chg-up { color: #ef4444; }      /* 涨: 红 */
+        .chg-down { color: #10b981; }    /* 跌: 绿 */
+        .chg-flat { color: var(--text-muted); }
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .period-btn {
+            background: #232731;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .period-btn.active {
+            background: var(--active-tab);
+            color: #fff;
+            border-color: var(--active-tab);
+        }
+        .period-btn.sub-ind-active {
+            background: #14532d;
+            color: #86efac;
+            border-color: #166534;
+        }
+        .legend {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            margin-left: auto;
+        }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-color { width: 10px; height: 3px; border-radius: 2px; }
+        #ohlc-legend {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 3px 12px;
+            min-height: 22px;
+            padding: 0 4px;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+            font: 11px/18px monospace;
+        }
+        #ohlc-legend span { white-space: nowrap; }
+        #chart-wrapper {
+            flex: 1;
+            min-height: 300px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            overflow: hidden;   /* 画布初始化可能比内容宽 2px, 裁掉以保右边框可见 */
+        }
+        #subchart-wrapper {
+            height: 160px;
+            width: 100%;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .indicator-card {
+            background: #232731;
+            padding: 8px 10px;
+            border-radius: 6px;
+        }
+        .indicator-name { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+        .indicator-val { font-size: 13px; font-weight: 600; font-family: monospace; }
+        .score-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: #1e293b;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+        .score-val { font-size: 20px; font-weight: bold; color: #3b82f6; }
+        .tag-passed { color: #10b981; font-weight: bold; }
+        .tag-failed { color: #ef4444; }
+        .sig-long { color: #ef4444; }
+        .sig-short { color: #10b981; }
+        .sig-oi { color: #f59e0b; }
+        .reason-box {
+            background: #232731;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .event-item {
+            background: #232731;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 11px;
+            border-left: 3px solid #3b82f6;
+        }
+        .event-item.warning { border-left-color: #f59e0b; }
+        .event-item.error { border-left-color: #ef4444; }
+        .event-header { display: flex; justify-content: space-between; margin-bottom: 3px; }
+        .event-time { color: var(--text-muted); font-size: 10px; }
+        .event-msg { color: #cbd5e1; word-break: break-all; }
+        .ai-modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:160; align-items:center; justify-content:center; }
+        .ai-modal-card { width:min(820px, 94vw); max-height:88vh; overflow-y:auto; background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:16px; }
+        .ai-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+        .ai-field { display:flex; flex-direction:column; gap:4px; color:var(--text-muted); font-size:11px; }
+        .ai-field input, .ai-field select { width:100%; background:#121418; border:1px solid var(--border-color); color:#fff; padding:6px 8px; border-radius:4px; font-size:12px; }
+        .ai-action { border:1px solid var(--border-color); background:#232731; color:#cbd5e1; border-radius:4px; padding:5px 10px; cursor:pointer; font-size:11px; }
+        .ai-primary { background:#2563eb; border-color:#2563eb; color:#fff; }
+        .ai-danger { color:#fca5a5; border-color:#7f1d1d; }
+        .ai-model-row, .ai-result-card { background:#1e293b; border:1px solid var(--border-color); border-radius:6px; padding:9px; margin-bottom:7px; }
+        .ai-verification-card { width:min(1440px, 96vw); max-height:92vh; padding:22px; scrollbar-width:thin; scrollbar-color:#475569 #1b1e24; }
+        .ai-verification-header { position:sticky; top:-22px; z-index:3; display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--card-bg); padding:12px 0; border-bottom:1px solid var(--border-color); margin:-10px 0 14px; }
+        .ai-verification-header strong { font-size:18px; }
+        .ai-verification-card .ai-action { padding:8px 14px; border-radius:6px; font-size:12px; }
+        .ai-verification-card .ai-field select, .ai-verification-card .ai-field input { padding:9px 10px; font-size:13px; }
+        .ai-verification-overview { font-size:16px; font-weight:600; margin:16px 0 10px; color:#e2e8f0; }
+        .ai-verification-activity { white-space:pre-wrap; overflow-wrap:anywhere; padding:12px 14px; margin:10px 0; border:1px solid #385778; border-radius:8px; background:#152438; color:#dbeafe; font-size:13px; line-height:1.8; }
+        .ai-verification-config { border:1px solid var(--border-color); border-radius:8px; padding:10px 14px; margin:10px 0; background:#181f2a; }
+        .ai-verification-config summary { cursor:pointer; color:#94a3b8; font-size:12px; }
+        .ai-verification-note { padding:11px 14px; background:#172033; border:1px solid #334155; border-radius:8px; color:#d8b36a; font-size:12px; line-height:1.7; margin:14px 0; }
+        .ai-verification-prompt { margin:16px 0; padding:16px; background:#171d26; border:1px solid #303b4b; border-radius:10px; }
+        .ai-verification-prompt-header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+        .ai-verification-prompt-header label { color:#dbe4ef; font-size:13px; font-weight:600; }
+        .ai-verification-prompt-header small { color:#8291a6; font-weight:400; margin-left:8px; }
+        .ai-verification-prompt-state { padding:4px 9px; border:1px solid #3b4656; border-radius:6px; background:#252d39; color:#a7b6c9; font-size:11px; }
+        .ai-verification-prompt-state[data-editable="true"] { background:#172f2b; color:#8bd4bd; border-color:#31564b; }
+        .ai-verification-prompt textarea { display:block; width:100%; box-sizing:border-box; min-height:136px; padding:12px 14px; resize:vertical; border:1px solid #3a495e; border-radius:8px; background:#101721; color:#dbe4ef; font-family:inherit; font-size:13px; line-height:1.8; outline:none; }
+        .ai-verification-prompt textarea:focus { border-color:#5798e8; box-shadow:0 0 0 2px #5798e822; }
+        .ai-verification-prompt textarea[readonly] { background:#151b24; color:#aebdce; border-color:#303b4b; }
+        .ai-verification-prompt-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:10px; }
+        .ai-verification-prompt-help { flex:1 1 260px; color:#899ab1; font-size:12px; line-height:1.7; }
+        .ai-verification-prompt-footer .ai-action { flex:0 0 auto; width:auto; }
+        .ai-verification-metrics { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:10px; margin:16px 0 24px; }
+        .ai-verification-metric { padding:14px 12px; background:#1e293b; border:1px solid #29364b; border-radius:8px; min-width:0; }
+        .ai-verification-metric span { display:block; color:#94a3b8; font-size:12px; line-height:1.5; min-height:36px; margin-bottom:6px; }
+        .ai-verification-metric strong { font-size:20px; font-variant-numeric:tabular-nums; }
+        .ai-verification-card > strong { display:block; font-size:14px !important; margin:20px 0 10px; }
+        .ai-verification-table-wrap { overflow-x:auto; margin:10px 0 22px; border:1px solid var(--border-color); border-radius:8px; scrollbar-width:thin; scrollbar-color:#475569 #1b1e24; }
+        .ai-verification-table { width:100%; border-collapse:collapse; font-size:12px; font-variant-numeric:tabular-nums; }
+        .ai-verification-table th, .ai-verification-table td { padding:12px 14px; border:0; border-bottom:1px solid #29313d; text-align:left; vertical-align:middle; }
+        .ai-verification-table th { background:#172033; font-weight:500; color:#94a3b8; white-space:nowrap; }
+        .ai-verification-table tbody tr:last-child td { border-bottom:0; }
+        .ai-verification-trial-table { min-width:880px; table-layout:fixed; }
+        .ai-verification-trial-table th:nth-child(1), .ai-verification-trial-table th:nth-child(2) { width:13%; }
+        .ai-verification-trial-table th:nth-child(3) { width:13%; }
+        .ai-verification-trial-table th:nth-child(4), .ai-verification-trial-table th:nth-child(5) { width:11%; }
+        .ai-verification-trial-table th:nth-child(6) { width:17%; }
+        .ai-verification-trial-table th:nth-child(7) { width:22%; }
+        .ai-verification-trial-table tbody tr:nth-child(4n+1), .ai-verification-trial-table tbody tr:nth-child(4n+2) { background:#1d242f; }
+        .ai-verification-stack { display:flex; flex-direction:column; gap:5px; line-height:1.4; }
+        .ai-verification-stack > span { font-weight:500; }
+        .ai-verification-stack small { font-size:11px; color:#94a3b8; }
+        .ai-verification-status[data-status="OPEN"], .ai-verification-status[data-status="WAITING_TRIGGER"] { color:#93c5fd; }
+        .ai-verification-status[data-status="SKIPPED"], .ai-verification-status[data-status="UNVERIFIABLE"] { color:#d8b36a; }
+        .ai-verification-positive > span { color:#fca5a5; }
+        .ai-verification-negative > span { color:#6ee7b7; }
+        .ai-verification-reason { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; color:#cbd5e1; line-height:1.6; }
+        .ai-verification-detail-row > td { padding:0 14px 10px; }
+        .ai-verification-details summary { width:fit-content; cursor:pointer; color:#8bb9eb; font-size:11px; padding:4px 0; }
+        .ai-verification-detail-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:14px 24px; background:#151c27; border-radius:6px; padding:16px; margin:8px 0 2px; }
+        .ai-verification-detail-grid dt { font-size:11px; color:#94a3b8; margin-bottom:5px; }
+        .ai-verification-detail-grid dd { margin:0; color:#dbe5f1; line-height:1.6; overflow-wrap:anywhere; }
+        .ai-verification-detail-wide { grid-column:span 2; }
+        .ai-verification-ai-result { margin:10px 0 2px; padding:16px; background:#152438; border:1px solid #304862; border-radius:8px; }
+        .ai-verification-ai-result > strong { font-size:13px; color:#dbeafe; }
+        .ai-verification-ai-result > p { color:#9eb3cc; font-size:12px; line-height:1.7; margin:8px 0; }
+        .ai-verification-ai-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px 24px; margin:14px 0 0; }
+        .ai-verification-ai-grid dt { color:#94a3b8; font-size:11px; margin-bottom:5px; }
+        .ai-verification-ai-grid dd { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; color:#dbe5f1; line-height:1.8; }
+        .ai-verification-ai-wide { grid-column:1 / -1; }
+        .ai-verification-card button:disabled { opacity:.45; cursor:default; }
+        @media (max-width:1100px) { .ai-verification-metrics { grid-template-columns:repeat(4, minmax(0, 1fr)); } }
+        @media (max-width:650px) {
+            .ai-verification-card { padding:14px; width:96vw; }
+            .ai-verification-header { top:-14px; }
+            .ai-verification-metrics { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+            .ai-verification-detail-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+            .ai-verification-ai-result { max-width:calc(96vw - 90px); }
+            .ai-verification-ai-grid { grid-template-columns:minmax(0, 1fr); }
+        }
+        .right-panel { min-width:0; }
+        .analysis-toolbar { margin:14px 0 8px; }
+        .analysis-toolbar-head, .ai-batch-header, .ai-result-head { display:flex; justify-content:space-between; align-items:center; gap:8px; min-width:0; }
+        .analysis-toolbar-head { margin-bottom:8px; }
+        .analysis-toolbar-title { font-size:13px; font-weight:600; color:var(--text-muted); }
+        .analysis-toolbar-time, #ai-batch-meta { font-size:10px; color:var(--text-muted); text-align:right; overflow-wrap:anywhere; }
+        .analysis-actions { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; }
+        .analysis-actions .ai-action { width:100%; padding:6px 4px; white-space:nowrap; }
+        .ai-batch-header { align-items:flex-start; margin-bottom:7px; }
+        .ai-result-head { align-items:flex-start; margin-bottom:6px; }
+        .ai-result-head > :last-child { flex:1; text-align:right; overflow-wrap:anywhere; }
+        .ai-open-forecast { margin-top:7px; padding:7px 8px; border:1px solid #334155; border-radius:5px; background:#172033; font-size:11px; }
+        .ai-open-forecast-head { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; font-weight:600; }
+        .ai-open-forecast-summary { margin-top:4px; color:#cbd5e1; line-height:1.45; }
+        .ai-evaluation-box { margin-top:8px; padding:8px; border:1px solid #3b4555; border-radius:5px; background:#171b24; }
+        .ai-evaluation-controls { display:grid; grid-template-columns:minmax(110px,.7fr) minmax(160px,1.5fr) auto; gap:6px; margin-top:6px; }
+        .ai-evaluation-controls select, .ai-evaluation-controls input { min-width:0; background:#121418; color:#fff; border:1px solid var(--border-color); border-radius:4px; padding:5px 7px; font-size:11px; }
+        .ai-history-categories { display:flex; gap:6px; overflow-x:auto; margin-bottom:10px; padding-bottom:3px; }
+        .ai-history-categories .ai-action { flex:none; white-space:nowrap; }
+        .ai-history-row { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px; align-items:start; }
+        .ai-history-row.ai-history-active { outline:1px solid #3b82f6; background:#182335; }
+        .ai-history-row-text { min-width:0; line-height:1.55; overflow-wrap:anywhere; }
+        .ai-history-title { font-size:12px; font-weight:600; color:var(--text-color); }
+        .ai-history-model { margin-top:8px; padding-top:7px; border-top:1px solid #334155; }
+        .ai-history-model-name { font-weight:600; color:#93c5fd; }
+        .ai-history-horizon { margin-top:6px; padding:6px 8px; border-radius:4px; background:#172033; }
+        .ai-history-prediction { margin:3px 0; color:#94a3b8; }
+        .ai-history-summary { color:#cbd5e1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .ai-history-verification, .ai-history-meta { color:#94a3b8; }
+        .ai-history-date { color:#7dd3fc; font-weight:600; }
+        .ai-history-price { color:#c4b5fd; font-weight:600; }
+        .ai-history-actual { color:#67e8f9; font-weight:600; }
+        .ai-history-up, .ai-history-error { color:#f87171; font-weight:600; }
+        .ai-history-down, .ai-history-success { color:#34d399; font-weight:600; }
+        .ai-history-neutral { color:#fbbf24; font-weight:600; }
+        .ai-history-muted { color:#94a3b8; }
+        .ai-history-direction { display:inline-block; padding:0 6px; border-radius:4px; background:#ffffff0a; font-weight:700; }
+        .ai-history-evidence { display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:8px; padding:6px 8px; border-left:2px solid #64748b; background:#172033; }
+        .ai-history-evidence > .ai-history-price { flex-basis:100%; }
+        .ai-history-dimension { min-width:0; overflow-wrap:anywhere; }
+        .ai-history-dimension[open] { flex-basis:100%; }
+        .ai-history-dimension > summary { cursor:pointer; }
+        .ai-history-source { margin:4px 0 6px 10px; }
+        .ai-history-source a { color:#7dd3fc; text-decoration:underline; }
+        #ai-history-detail { display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color); }
+        .ai-session-choice-row { display:flex; align-items:center; gap:6px; min-width:0; }
+        .ai-session-choice-row > span { flex:none; }
+        .ai-session-choice-strip { display:flex; align-items:center; flex:1; min-width:0; gap:3px; }
+        .ai-session-choice-list { display:flex; flex:1; gap:5px; min-width:0; overflow-x:auto; padding:2px 0 4px; scrollbar-width:none; -ms-overflow-style:none; }
+        .ai-session-choice-list::-webkit-scrollbar { display:none; }
+        .ai-session-choice-arrow { flex:none; border:0; background:transparent; color:#93c5fd; padding:2px 3px; font-size:12px; cursor:pointer; }
+        .ai-session-choice-arrow:disabled { color:#475569; cursor:default; }
+        .ai-session-choice-arrow[hidden] { display:none; }
+        .ai-session-choice { flex:none; border:1px solid #475569; border-radius:5px; background:#121827; color:#cbd5e1; padding:4px 7px; font-size:10px; font-family:inherit; cursor:pointer; white-space:nowrap; }
+        .ai-session-choice.is-active { border-color:#60a5fa; background:#1d4ed8; color:#fff; }
+        .ai-conversation { margin-top:8px; padding:8px; border:1px solid #334155; border-radius:5px; background:#171b24; }
+        .ai-conversation-turn { margin-top:7px; padding-top:7px; border-top:1px solid #2d3748; white-space:pre-wrap; overflow-wrap:anywhere; }
+        .ai-conversation-compose { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:6px; margin-top:8px; }
+        .ai-conversation-compose textarea { min-height:58px; resize:vertical; background:#121418; color:#fff; border:1px solid var(--border-color); border-radius:4px; padding:6px 8px; font:11px/1.45 inherit; }
+        .ai-review-box { margin-top:8px; padding:8px; border:1px solid #4b5563; border-radius:5px; background:#191d27; font-size:11px; }
+        .ai-review-summary { margin-top:6px; padding:7px; border-radius:4px; background:#121827; white-space:pre-wrap; overflow-wrap:anywhere; color:#cbd5e1; }
+        .ai-raw-record { white-space:pre-wrap; overflow-wrap:anywhere; word-break:normal; max-height:260px; overflow:auto; background:#121418; border:1px solid var(--border-color); border-radius:4px; padding:8px; margin-top:7px; font:10px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace; }
+        #tab-events, #tab-tape, #tab-big {
+            min-height: 250px;
+        }
+        /* 左侧面板: 隐藏滚动条外观, 保留滚轮/触摸滚动 */
+        #events-container, #tape-container, #bigorders-container, .group-body,
+        #tab-events, #tab-tape, #tab-big,
+        #universe-results,
+        .grid-container > .panel:first-child,
+        #info-modal-body, #group-edit-list, #pick-chips {
+            scrollbar-width: none;           /* Firefox */
+            -ms-overflow-style: none;        /* IE/旧Edge */
+        }
+        #events-container::-webkit-scrollbar,
+        #tape-container::-webkit-scrollbar,
+        #bigorders-container::-webkit-scrollbar,
+        .group-body::-webkit-scrollbar,
+        #universe-results::-webkit-scrollbar,
+        #tab-events::-webkit-scrollbar,
+        #tab-tape::-webkit-scrollbar,
+        #tab-big::-webkit-scrollbar,
+        .grid-container > .panel:first-child::-webkit-scrollbar,
+        #info-modal-body::-webkit-scrollbar,
+        #group-edit-list::-webkit-scrollbar,
+        #pick-chips::-webkit-scrollbar {
+            display: none;                   /* Chrome/Edge/Safari */
+        }
+        /* 右侧面板: 隐藏滚动条外观, 保留滚动 */
+        html, body,
+        .grid-container > .panel:last-child,
+        #positions-list, #orders-list, #trades-list {
+            scrollbar-width: none;           /* Firefox */
+            -ms-overflow-style: none;        /* IE/旧Edge */
+        }
+        .grid-container > .panel:last-child::-webkit-scrollbar,
+        html::-webkit-scrollbar, body::-webkit-scrollbar,
+        #positions-list::-webkit-scrollbar,
+        #orders-list::-webkit-scrollbar,
+        #trades-list::-webkit-scrollbar {
+            display: none;                   /* Chrome/Edge/Safari */
+        }
+        .pick-chip { padding: 2px 8px; border: 1px solid var(--border-color); border-radius: 10px; cursor: pointer; user-select: none; color: var(--text-muted); }
+        .pick-chip.active { background: #1e3a5f; border-color: #3b82f6; color: #fff; }
+        #events-container {
+            max-height: 240px;
+            overflow-y: auto;
+        }
+            .market-simulator-drawer { position:fixed; right:0; top:0; bottom:0; width:min(700px,100vw); box-sizing:border-box; z-index:4000; overflow-y:auto; padding:20px; background:#151b25; color:#e5e7eb; box-shadow:-8px 0 30px #0008; }
+        .market-simulator-drawer button,.market-simulator-drawer input { padding:7px; margin:4px; border:1px solid #526078; border-radius:4px; background:#202b3a; color:#fff; }
+        .market-simulator-drawer input[type=range] { width:90%; }
+        .market-simulator-drawer label { display:block; margin-top:12px; }
+        .market-simulator-table { overflow-x:auto; }
+        .market-simulator-drawer table { width:100%; border-collapse:collapse; white-space:nowrap; }
+        .market-simulator-drawer td,.market-simulator-drawer th { text-align:left; padding:8px; border-bottom:1px solid #354054; }
+        .market-simulator-warning { color:#fbbf24; white-space:pre-wrap; }
+        .market-simulator-meta { font-size:12px; white-space:pre-wrap; color:#9daec4; }
+        .market-simulator-drawer p { margin:8px 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title" id="page-title">模拟交易 · 国内期货实时监控与客观规则分析</div>
+        <button id="market-simulator-open" hidden type="button">行情模拟</button>
+        <div id="universe-top" style="position:relative; width:340px; z-index:50;">
+            <input id="universe-search" type="text" placeholder="搜索全市场合约 (代码/名称)"
+                   style="width:100%; box-sizing:border-box; background:#1b1e24; border:1px solid var(--border-color); color:#fff; padding:6px 10px; border-radius:14px; font-size:12px; outline:none;">
+            <div id="universe-results" style="display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; max-height:300px; overflow-y:auto; background:#1b1e24; border:1px solid var(--border-color); border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,0.45);">
+                <div style="color:var(--text-muted); font-size:11px; padding:4px;">正在加载品种类别...</div>
+            </div>
+        </div>
+        <div style="display:flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <button id="ai-model-settings-btn" class="ai-action" onclick="openAIModelModal()">模型设置</button>
+            <button id="ai-research-settings-btn" class="ai-action" onclick="openAIResearchModal()">资料采集</button>
+            <button id="ai-materials-browser-btn" class="ai-action" onclick="openAIMaterialsModal()">资料查询</button>
+            <div class="status-badge"><span class="dot-ws" id="ws-dot"></span> <span id="ws-text">WS连接中</span></div>
+            <div class="status-badge" id="feed-badge">行情源: 检测中...</div>
+            <div class="status-badge" id="storage-badge">存储: 检测中...</div>
+            <div class="status-badge" id="user-badge">未登录</div>
+            <a id="nav-live-link" href="/live" style="display:none; text-decoration:none; background:#2b1214; color:#fca5a5; border:1px solid #b91c1c; padding:4px 10px; border-radius:12px; font-size:12px;">实盘交易页 →</a>
+        </div>
+    </header>
+
+    <!-- 新建分组弹窗 (替代原生 prompt, 内嵌浏览器可能屏蔽原生对话框) -->
+    <div id="group-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.55); z-index:100; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:16px; width:280px;">
+            <div style="font-size:13px; color:#fff; margin-bottom:10px;">新建分组</div>
+            <input id="group-name-input" maxlength="16" placeholder="分组名称 (1-16 字符)"
+                   style="width:100%; box-sizing:border-box; background:#1b1e24; border:1px solid var(--border-color); color:#fff; padding:6px 8px; border-radius:4px; font-size:12px; margin-bottom:12px; outline:none;">
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button onclick="closeGroupModal()" style="background:#1b1e24; border:1px solid var(--border-color); color:var(--text-muted); border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">取消</button>
+                <button onclick="submitGroupModal()" style="background:#3b82f6; border:none; color:#fff; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 重命名合约弹窗 -->
+    <div id="rename-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.55); z-index:100; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:16px; width:280px;">
+            <div style="font-size:13px; color:#fff; margin-bottom:4px;"><span id="rename-modal-title">重命名合约</span> <span id="rename-symbol" style="color:var(--text-muted); font-weight:normal;"></span></div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:10px;">留空则恢复默认名称</div>
+            <input id="rename-input" maxlength="20" placeholder="合约显示名称"
+                   style="width:100%; box-sizing:border-box; background:#1b1e24; border:1px solid var(--border-color); color:#fff; padding:6px 8px; border-radius:4px; font-size:12px; margin-bottom:12px; outline:none;">
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button onclick="closeRenameModal()" style="background:#1b1e24; border:1px solid var(--border-color); color:var(--text-muted); border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">取消</button>
+                <button onclick="submitRenameModal()" style="background:#3b82f6; border:none; color:#fff; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 合约基本信息弹窗 (右键监控合约 → 查看基本信息) -->
+    <div id="info-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.55); z-index:120; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:16px; width:360px; max-height:80vh; display:flex; flex-direction:column;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;">
+                <div style="font-size:14px; color:#fff;">
+                    <span id="info-modal-name">--</span>
+                    <span id="info-modal-symbol" style="color:var(--text-muted); font-weight:normal; font-size:11px; font-family:monospace;"></span>
+                </div>
+                <span id="info-modal-badge" style="font-size:10px; padding:1px 6px; border-radius:3px;"></span>
+            </div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px;">
+                <span id="info-modal-sub"></span>
+            </div>
+            <div id="info-modal-body" style="overflow-y:auto; overflow-x:hidden; min-height:0; padding-right:4px; scrollbar-width:none; -ms-overflow-style:none;"></div>
+            <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+                <button onclick="closeInfoModal()" style="background:#1b1e24; border:1px solid var(--border-color); color:var(--text-muted); border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改分组弹窗 (右键监控合约 → 修改分组) -->
+    <div id="group-edit-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.55); z-index:120; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:16px; width:340px; max-height:80vh; display:flex; flex-direction:column;">
+            <div style="font-size:13px; color:#fff; margin-bottom:2px;">修改分组</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:12px;">
+                <span id="group-edit-symbol" style="font-family:monospace;"></span>
+                <span id="group-edit-name"></span>
+            </div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:6px;">修改方式</div>
+            <div id="group-edit-mode" style="display:flex; gap:4px; margin-bottom:4px;">
+                <button class="period-btn active" data-mode="replace" onclick="setGroupEditMode('replace')">改到该分组</button>
+                <button class="period-btn" data-mode="multi" onclick="setGroupEditMode('multi')">多组叠加</button>
+            </div>
+            <div id="group-edit-mode-hint" style="font-size:10px; color:var(--text-muted); margin-bottom:10px;"></div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:6px;">所属分组</div>
+            <div id="group-edit-list" style="display:flex; flex-wrap:wrap; gap:6px; overflow-y:auto; max-height:150px; padding:2px 0 8px; font-size:11px; scrollbar-width:none; -ms-overflow-style:none;"></div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:6px;">新建分组</div>
+            <div style="display:flex; gap:6px; margin-bottom:8px;">
+                <input id="group-edit-new" maxlength="16" placeholder="输入新分组名称 (1-16 字符)"
+                       onkeydown="if (event.key === 'Enter') { event.preventDefault(); addGroupEditNew(); }"
+                       style="flex:1; min-width:0; box-sizing:border-box; background:#1b1e24; border:1px solid var(--border-color); color:#fff; padding:6px 8px; border-radius:4px; font-size:12px; outline:none;">
+                <button onclick="addGroupEditNew()" style="background:#1b1e24; border:1px solid var(--border-color); color:#7dd3fc; border-radius:4px; padding:4px 10px; font-size:12px; cursor:pointer; white-space:nowrap;">添加</button>
+            </div>
+            <div id="group-edit-hint" style="font-size:10px; color:var(--text-muted); margin-bottom:12px;"></div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button onclick="closeGroupEdit()" style="background:#1b1e24; border:1px solid var(--border-color); color:var(--text-muted); border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">取消</button>
+                <button onclick="submitGroupEdit()" style="background:#3b82f6; border:none; color:#fff; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索添加合约弹窗 (搜索结果点合约 → 选分组后订阅) -->
+    <div id="pick-group-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.55); z-index:120; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:16px; width:320px; max-height:80vh; display:flex; flex-direction:column;">
+            <div style="font-size:13px; color:#fff; margin-bottom:2px;">添加到监控</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:12px;">
+                <span id="pick-symbol" style="font-family:monospace; color:#7dd3fc;"></span>
+                <span id="pick-name"></span>
+            </div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:6px;">选择分组 (可多选, 不选则归入「默认」)</div>
+            <div id="pick-chips" style="display:flex; flex-wrap:wrap; gap:6px; overflow-y:auto; max-height:150px; padding:2px 0 8px; font-size:11px; scrollbar-width:none; -ms-overflow-style:none;"></div>
+            <div id="pick-hint" style="font-size:10px; color:var(--text-muted); margin-bottom:12px;"></div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button onclick="closePickGroupModal()" style="background:#1b1e24; border:1px solid var(--border-color); color:var(--text-muted); border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">取消</button>
+                <button id="pick-confirm-btn" onclick="confirmPickAdd()" style="background:#3b82f6; border:none; color:#fff; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 模型设置窗口：参数入库，API Key 只写入 Windows 凭据管理器 -->
+    <div id="ai-verification-modal" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="ai-verification-title">
+        <div id="ai-verification-panel" class="ai-modal-card ai-verification-card">
+            <div class="ai-verification-header">
+                <strong id="ai-verification-title">AI 盘时段模拟验证</strong>
+                <button type="button" class="ai-action" onclick="closeAIVerificationModal()">关闭</button>
+            </div>
+            <div id="ai-verification-account" style="font-size:11px; color:var(--text-muted); margin:8px 0;"></div>
+            <div id="ai-verification-refresh-status" role="status" style="font-size:11px; color:#94a3b8; margin:8px 0;">每 2 秒自动刷新</div>
+            <div class="ai-form-grid" style="grid-template-columns:minmax(0, 1fr) auto; align-items:end;">
+                <label class="ai-field">历史计划<select id="ai-verification-plan-select" onchange="selectAIVerificationPlan(this.value)"><option value="">新建计划</option></select></label>
+                <button id="ai-verification-new" type="button" class="ai-action" onclick="newAIVerificationPlan()">新建计划</button>
+            </div>
+            <div id="ai-verification-active-note" style="font-size:12px; color:#fbbf24; margin-top:7px;"></div>
+            <div id="ai-verification-form" style="margin-top:12px;">
+                <strong style="font-size:12px;">创建并启动新计划（交易规则与成本启动后冻结）</strong>
+                <div class="ai-form-grid" style="margin-top:9px;">
+                    <label class="ai-field">具体合约<input id="ai-verification-instrument" maxlength="16" placeholder="例如 FU2611，不支持主连"></label>
+                    <label class="ai-field">可用模型<select id="ai-verification-model"><option value="">请选择模型</option></select></label>
+                    <label class="ai-field">每边每手手续费（人民币元）<input id="ai-verification-commission-per-side" type="number" min="0" step="any" placeholder="必须明确填写，可填 0"></label>
+                    <label class="ai-field">每边滑点（跳）<input id="ai-verification-slippage-ticks" type="number" min="0" step="any" value="0" placeholder="默认 0，可自定义"></label>
+                    <label class="ai-field">每百万输入 token（人民币元）<input id="ai-verification-input-price" type="number" min="0" step="any" value="0" placeholder="默认 0，可自定义"></label>
+                    <label class="ai-field">每百万输出 token（人民币元）<input id="ai-verification-output-price" type="number" min="0" step="any" value="0" placeholder="默认 0，可自定义"></label>
+                </div>
+                <div class="ai-verification-note">固定规则：每个交易小节开盘 15 分钟后开始；明确方向返回后等待行情或模拟交易结果，出现结果才继续分析。未成交信号从模型完成起满 5 分钟未触发则作废并重新分析；未成交只扣实际模型费用，不记交易盈亏或交易胜负；已有持仓从模型完成起满 10 分钟仍未止盈/止损，按截止后首笔新鲜盘口结算，按交易净收益扣本次模型费用判断胜负；零收益不计盈利或亏损，费用未知暂不判胜负，退出后再分析。缺新鲜报价则等待结算；小节先收盘且不足 10 分钟的提前结算不计胜负。无明确方向或无有效结果则 5 分钟后重试；模型发起后 10 分钟仍未返回也作废重试。小节结束前最后 5 分钟（含恰好剩余 5 分钟）停止新分析，已有持仓继续结算。固定 1 手、最多一仓，先运行 20 个实际交易日，小节结束退出。启动后会自动调用模型并产生费用；每次实际模型调用均计费，超时迟到结果只追踪费用，不用于成交。请选择已关注且有实时新浪行情的合约，Gemini 为默认分析模型；持仓浮动收益每 2 秒更新，按可平仓盘口估算（含双边手续费及滑点），缺新鲜报价显示待报价，已实现收益以实际平仓账本为准。本功能不自动订阅或回补；新浪采样盘口不保证实际成交。</div>
+                <button id="ai-verification-start" type="button" class="ai-action ai-primary" onclick="startAIVerificationPlan()">创建并启动（会调用模型并产生费用）</button>
+            </div>
+            <div class="ai-verification-prompt">
+                <div class="ai-verification-prompt-header">
+                    <label for="ai-verification-requirements">模型计划提示词<small>最多 2000 字</small></label>
+                    <span id="ai-verification-prompt-state" class="ai-verification-prompt-state">新计划 · 可编辑</span>
+                </div>
+                <textarea id="ai-verification-requirements" maxlength="2000" rows="5" aria-describedby="ai-verification-prompt-help" placeholder="填写发送给当前计划模型的分析要求"></textarea>
+                <div class="ai-verification-prompt-footer">
+                    <div id="ai-verification-prompt-help" class="ai-verification-prompt-help">为当前模型设置分析要求，创建时随计划保存。</div>
+                    <button id="ai-verification-save-requirements" type="button" class="ai-action ai-primary" onclick="saveAIVerificationRequirements()">保存提示词</button>
+                </div>
+            </div>
+            <div id="ai-verification-message" role="status" style="font-size:12px; color:#93c5fd; margin:10px 0;"></div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button id="ai-verification-stop" type="button" class="ai-action ai-danger" disabled onclick="stopAIVerificationPlan()">停止选中计划</button>
+                <button id="ai-verification-resume" type="button" class="ai-action ai-primary" disabled onclick="resumeAIVerificationPlan()">重新启用选中计划</button>
+                <button id="ai-verification-copy-restart" type="button" class="ai-action ai-primary" disabled onclick="copyRestartAIVerificationPlan()">复制并重新开始计划</button>
+                <button id="ai-verification-export" type="button" class="ai-action" disabled onclick="exportAIVerificationReport()">导出 JSON 报告</button>
+            </div>
+            <div id="ai-verification-plan-overview" class="ai-verification-overview"></div>
+            <div id="ai-verification-activity" class="ai-verification-activity" aria-label="计划当前与下一步安排"></div>
+            <details class="ai-verification-config"><summary>计划信息、验证规则与费用参数</summary>
+            <div id="ai-verification-plan-meta" style="white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; line-height:1.7; margin-top:10px;"></div>
+            </details>
+            <div id="ai-verification-warning" class="ai-verification-note" role="status">新浪采样模拟样本；尚未启动计划。</div>
+            <div id="ai-verification-metrics" class="ai-verification-metrics"></div>
+            <strong style="font-size:12px;">日汇总（人民币）</strong>
+            <div id="ai-verification-daily" class="ai-verification-table-wrap"></div>
+            <strong style="font-size:12px;">逐次分析记录与逐笔成交（北京时间 / 人民币）</strong>
+            <div id="ai-verification-trials" class="ai-verification-table-wrap"></div>
+        </div>
+    </div>
+
+    <div id="ai-model-modal" class="ai-modal-backdrop">
+        <div class="ai-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <strong>AI 模型设置</strong>
+                <button class="ai-action" onclick="closeAIModelModal()">关闭</button>
+            </div>
+            <div id="ai-model-list" style="margin-bottom:12px;"><span style="color:var(--text-muted);">正在读取模型...</span></div>
+            <div style="border-top:1px solid var(--border-color); padding-top:12px;">
+                <strong id="ai-model-form-title" style="font-size:12px;">新增模型</strong>
+                <input id="ai-model-id" type="hidden">
+                <div class="ai-form-grid" style="margin-top:9px;">
+                    <label class="ai-field">显示名称<input id="ai-model-name" maxlength="64" placeholder="例如：DeepSeek 推理"></label>
+                    <label class="ai-field">接口类型<select id="ai-model-provider" onchange="syncAIProviderFields()"><option value="openai_compatible">OpenAI Compatible</option><option value="google_gemini">Google Gemini 原生</option></select></label>
+                    <label class="ai-field" style="grid-column:1/-1;">API 地址<input id="ai-model-url" maxlength="512" placeholder="https://api.example.com/v1"></label>
+                    <label class="ai-field">模型标识<input id="ai-model-code" maxlength="128" placeholder="例如：deepseek-reasoner"></label>
+                    <label class="ai-field">API Key（编辑留空表示不变）<input id="ai-model-key" type="password" maxlength="4096" autocomplete="new-password" placeholder="不会回显或写入数据库"></label>
+                    <label class="ai-field">最大上下文 Token<input id="ai-model-context" type="number" min="1024" max="2000000" value="32768"></label>
+                    <label class="ai-field">最大输出 Token<input id="ai-model-output" type="number" min="128" max="65536" value="2000"></label>
+                    <label class="ai-field">超时秒数<input id="ai-model-timeout" type="number" min="5" max="600" value="90"></label>
+                    <label class="ai-field">温度<input id="ai-model-temperature" type="number" min="0" max="2" step="0.1" value="0.1"></label>
+                </div>
+                <div style="display:flex; gap:14px; flex-wrap:wrap; margin:10px 0; font-size:11px;">
+                    <label><input id="ai-model-requires-key" type="checkbox" checked> 需要 API Key</label>
+                    <label><input id="ai-model-local" type="checkbox"> 本机/局域网服务</label>
+                    <label><input id="ai-model-enabled" type="checkbox" checked> 启用</label>
+                </div>
+                <div id="ai-model-form-message" style="min-height:18px; color:#f59e0b; font-size:11px;"></div>
+                <div style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button class="ai-action" onclick="resetAIModelForm()">重置</button>
+                    <button id="ai-model-save" class="ai-action ai-primary" onclick="saveAIModel()">保存模型</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-research-modal" class="ai-modal-backdrop">
+        <div class="ai-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <strong>公开资料采集</strong><button class="ai-action" onclick="closeAIResearchModal()">关闭</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">保存前仅预览。常规资料由程序固定采集，不需要研究模型；开启 AI 辅助后，才会对新增复杂正文提取或按冷却补查，可能产生模型调用费用。</div>
+            <label style="font-size:12px;"><input id="ai-research-enabled" type="checkbox" onchange="previewAIResearchSettings()"> 开启定时采集</label>
+            <label style="font-size:12px; margin-left:14px;"><input id="ai-research-ai-enabled" type="checkbox" onchange="previewAIResearchSettings()"> AI 辅助研究</label>
+            <div class="ai-form-grid" style="margin:10px 0;">
+                <label class="ai-field">研究模型（仅用于辅助提取与补查）<select id="ai-research-model" onchange="previewAIResearchSettings()"></select></label>
+                <label class="ai-field">采集间隔<select id="ai-research-interval" onchange="previewAIResearchSettings()"><option value="15">15 分钟</option><option value="30">30 分钟</option><option value="60" selected>60 分钟</option><option value="120">120 分钟</option></select></label>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+                <input id="ai-research-search" placeholder="搜索具体月份合约（代码或名称）" oninput="scheduleAIResearchSearch()" style="flex:1; min-width:200px; background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:7px;">
+                <button class="ai-action" onclick="importAIResearchWatchlist()">从自选导入</button>
+            </div>
+            <div id="ai-research-search-results" style="max-height:180px; overflow-y:auto; margin-bottom:8px;"></div>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px;">自选导入为一次性复制；每个合约独立采集和分析。基本面有效期 14 天，事件及相关市场 7 天；宏观按最新官方发布核验。</div>
+            <div id="ai-research-contracts"></div>
+            <div id="ai-research-preview" style="font-size:11px; color:#7dd3fc; margin:10px 0;"></div>
+            <div id="ai-research-message" style="min-height:18px; font-size:11px; color:#f59e0b;"></div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; margin-bottom:12px;">
+                <button class="ai-action" onclick="openAIMaterialEntryModal()">录入资料</button>
+                <input type="file" id="ai-materials-import-file" accept=".json,application/json" style="display:none" onchange="importAIMaterialsFile(this)">
+                <button class="ai-action" onclick="document.getElementById('ai-materials-import-file').click()"
+                        title="导入 JSON 文件：数组或单条对象，字段 target/dimension/title/body，可选 url/source_name/published_at/data_period">导入资料</button>
+                <button class="ai-action" onclick="reloadAIResearchSettings()">刷新已保存设置</button>
+                <button id="ai-research-refresh" class="ai-action" onclick="refreshAIResearch()">立即更新资料</button>
+                <button id="ai-research-save" class="ai-action ai-primary" onclick="saveAIResearchSettings()">保存设置</button>
+            </div>
+            <div id="ai-research-status" style="font-size:11px; border-top:1px solid var(--border-color); padding-top:10px;"></div>
+        </div>
+    </div>
+
+    <div id="ai-material-entry-modal" class="ai-modal-backdrop" style="display:none; z-index:170;">
+        <div class="ai-modal-card" style="max-width:640px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <strong>录入资料</strong><button class="ai-action" onclick="closeAIMaterialEntryModal()">关闭</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">录入的资料来源标记为“手工录入”，与常规采集一样进入资料库、查询与预测冻结。未提供发布日期或资料期的资料仅作为背景资料，不进入预测主证据。</div>
+            <div class="ai-form-grid" style="margin-bottom:8px;">
+                <label class="ai-field">目标<select id="ai-entry-target" onchange="onAIMaterialEntryTargetChange()"></select></label>
+                <label class="ai-field">维度<select id="ai-entry-dimension"></select></label>
+            </div>
+            <div style="margin-bottom:8px;"><input id="ai-entry-title" placeholder="标题（必填）" style="width:100%; box-sizing:border-box; background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:7px;"></div>
+            <div style="margin-bottom:8px;"><textarea id="ai-entry-body" placeholder="正文（必填，直接粘贴原文）" rows="7" style="width:100%; box-sizing:border-box; background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:7px; font-family:inherit;"></textarea></div>
+            <div class="ai-form-grid" style="margin-bottom:8px;">
+                <label class="ai-field">原文链接（可选）<input id="ai-entry-url" placeholder="https://…"></label>
+                <label class="ai-field">来源名称（可选）<input id="ai-entry-source" placeholder="默认：手工录入"></label>
+            </div>
+            <div class="ai-form-grid" style="margin-bottom:8px;">
+                <label class="ai-field">发布日期（可选，点击选择）<input id="ai-entry-published" type="date" onclick="try{this.showPicker()}catch(e){}"></label>
+                <label class="ai-field">资料期（可选，点击选择月份）<input id="ai-entry-period" type="month" onclick="try{this.showPicker()}catch(e){}"></label>
+            </div>
+            <div id="ai-entry-message" style="min-height:16px; font-size:11px; color:#f59e0b; margin-bottom:6px;"></div>
+            <div style="display:flex; gap:6px; justify-content:flex-end;">
+                <button class="ai-action" onclick="closeAIMaterialEntryModal()">取消</button>
+                <button class="ai-action ai-primary" onclick="submitAIMaterialEntry()">入库</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-materials-modal" class="ai-modal-backdrop">
+        <div class="ai-modal-card" style="width:min(760px,96vw);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <strong>资料查询</strong><button class="ai-action" onclick="closeAIMaterialsModal()">关闭</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">默认显示最新版本。有效性按所选目标合约和查询时点判断。查看正文可追溯保存原文。</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+                <select id="ai-materials-instrument" onchange="queryAIMaterials()" style="background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:6px;"></select>
+                <select id="ai-materials-topic" onchange="queryAIMaterials()" style="background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:6px;"></select>
+                <select id="ai-materials-dimension" onchange="queryAIMaterials()" style="background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:6px;">
+                    <option value="">全部维度</option>
+                    <option value="fundamentals">基本面</option>
+                    <option value="macro">宏观</option>
+                    <option value="events">事件</option>
+                    <option value="related_markets">相关市场</option>
+                </select>
+                <select id="ai-materials-method" onchange="queryAIMaterials()" style="background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:6px;">
+                    <option value="">全部来源方式</option>
+                    <option value="FIXED_SOURCE">固定来源</option>
+                    <option value="RULE_SEARCH">规则搜索</option>
+                    <option value="AI_DISCOVERY">AI 发现</option>
+                    <option value="MANUAL">手工录入</option>
+                </select>
+                <input id="ai-materials-keyword" placeholder="标题或正文关键词" onkeydown="if(event.key==='Enter')queryAIMaterials()" style="flex:1; min-width:160px; background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:6px;">
+                <button class="ai-action" onclick="queryAIMaterials()">查询最新</button>
+                <button class="ai-action" onclick="openAIMaterialEntryModal()">录入资料</button>
+                <button class="ai-action" onclick="exportAIMaterials()"
+                        title="按当前筛选导出资料全文为 JSON（最多500条），字段与导入格式兼容">导出结果</button>
+            </div>
+            <div id="ai-materials-message" style="min-height:16px; font-size:11px; color:#f59e0b;"></div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:10px; color:var(--text-muted); margin-bottom:6px;">
+                <span>维度图例：</span>
+                <span style="color:#22d3ee;">基本面（品种自身供需库存）</span>
+                <span style="color:#fb923c;">宏观（统计局/央行等公共数据）</span>
+                <span style="color:#fbbf24;">事件（政策/地缘/突发）</span>
+                <span style="color:#818cf8;">相关市场（外部市场资讯）</span>
+            </div>
+            <div id="ai-materials-list" style="max-height:440px; overflow-y:auto;"></div>
+            <div id="ai-materials-pager" style="display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:8px; font-size:11px; color:var(--text-muted);"></div>
+        </div>
+    </div>
+
+    <!-- AI 分析模型选择窗口 -->
+    <div id="ai-analysis-modal" class="ai-modal-backdrop">
+        <div id="ai-analysis-card" class="ai-modal-card" style="width:min(560px,94vw);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <strong id="ai-modal-title">AI 分析</strong>
+                <button class="ai-action" onclick="closeAIAnalysisModal()">关闭</button>
+            </div>
+            <div id="ai-analysis-summary" style="font-size:12px; margin-bottom:10px;"></div>
+            <div id="ai-future-cache-status" style="display:none; font-size:11px; margin-bottom:10px;"></div>
+            <div id="ai-analysis-targets" style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:10px;">
+                <label class="ai-model-row" style="display:flex; gap:8px; align-items:flex-start; cursor:pointer; margin:0;">
+                    <input type="radio" name="ai-analysis-target" value="TODAY" checked onchange="syncAIAnalysisTarget()">
+                    <span><strong>分析今日</strong><br><small style="color:var(--text-muted);">只判断当前交易日盘中走势与关键价位</small></span>
+                </label>
+                <label class="ai-model-row" style="display:flex; gap:8px; align-items:flex-start; cursor:pointer; margin:0;">
+                    <input type="radio" name="ai-analysis-target" value="NEXT_OPEN" onchange="syncAIAnalysisTarget()">
+                    <span><strong>分析明日</strong><br><small style="color:var(--text-muted);">只预测下一交易日开盘走势</small></span>
+                </label>
+
+            </div>
+            <label id="ai-session-picker" style="display:none; font-size:11px; color:var(--text-muted); margin-bottom:10px;">
+                选择交易时段
+                <select id="ai-session-select" onchange="syncAISessionSelection()" style="display:block; width:100%; margin-top:5px; background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:7px 8px;"></select>
+            </label>
+            <label for="ai-analysis-requirements" style="display:block; font-size:11px; color:var(--text-muted); margin-bottom:5px;">发送给模型的分析要求（可微调）</label>
+            <textarea id="ai-analysis-requirements" maxlength="2000" oninput="saveAIAnalysisRequirements()" style="width:100%; min-height:92px; resize:vertical; box-sizing:border-box; background:#121418; color:var(--text-primary); border:1px solid var(--border-color); border-radius:5px; padding:8px; font:11px/1.5 inherit; margin-bottom:10px;"></textarea>
+            <label class="ai-model-row" style="display:flex; gap:8px; align-items:flex-start; cursor:pointer; margin-bottom:10px;">
+                <input id="ai-use-review-summaries" type="checkbox" onchange="saveAIReviewPreference()">
+                <span><strong>使用已启用的AI复盘总结</strong><br><small id="ai-review-match-text" style="color:var(--text-muted);">正在匹配可用总结...</small></span>
+            </label>
+            <label class="ai-model-row" style="display:flex; gap:8px; align-items:center; cursor:pointer; margin-bottom:10px;">
+                <input id="ai-self-consistency" type="checkbox">
+                <span><strong>三重投票</strong><br><small style="color:var(--text-muted);">同一模型独立跑 3 次取方向多数，成本×3，可降低单次波动</small></span>
+            </label>
+            <details id="ai-instruction-preview" ontoggle="refreshAIInstructionPreview()" style="margin-bottom:10px; border:1px solid var(--border-color); border-radius:5px; padding:7px 8px;">
+                <summary style="cursor:pointer; font-size:11px; color:#93c5fd;">查看发送给 AI 的全部指令</summary>
+                <pre id="ai-instruction-preview-content" class="ai-raw-record" style="max-height:320px;">展开后读取...</pre>
+            </details>
+            <div style="font-size:10px; color:var(--text-muted); margin-bottom:5px;">可勾选多个 AI 同批分析（最多 5 个，同时执行 3 个）。</div>
+            <div id="ai-analysis-models"></div>
+            <div id="ai-analysis-data-notice" style="font-size:10px; color:#f59e0b; margin:8px 0;">远程模型会接收当前合约当日全部 1 分钟数据，可能产生调用费用；AI 结果不会自动下单。</div>
+            <div id="ai-analysis-message" style="min-height:18px; color:#f59e0b; font-size:11px;"></div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; position:sticky; bottom:-16px; background:var(--card-bg); margin:8px -16px -16px; padding:10px 16px 16px; border-top:1px solid var(--border-color); border-radius:0 0 8px 8px;">
+                <button class="ai-action" onclick="closeAIAnalysisModal()">取消</button>
+                <button id="ai-analysis-start" class="ai-action ai-primary" onclick="startAIAnalysis()">开始分析</button>
+            </div>
+        </div>
+    </div>
+    <div id="ai-session-modal" class="ai-modal-backdrop"></div>
+    <div id="ai-future-modal" class="ai-modal-backdrop"></div>
+
+    <div id="ai-history-modal" class="ai-modal-backdrop">
+        <div class="ai-modal-card" style="width:min(820px,94vw);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <strong>AI 分析历史 · <span id="ai-history-symbol">--</span></strong>
+                <button class="ai-action" onclick="closeAIHistoryModal()">关闭</button>
+            </div>
+            <div id="ai-history-categories" class="ai-history-categories" role="group" aria-label="历史分析类型"></div>
+            <label style="display:flex; align-items:center; gap:6px; margin-bottom:9px; font-size:11px; color:var(--text-muted); cursor:pointer;">
+                <input id="ai-history-today-only" type="checkbox" onchange="loadAIHistory()">
+                <span id="ai-history-today-label">仅显示当前交易日</span>
+            </label>
+            <div id="ai-history-list" style="font-size:11px; color:var(--text-muted);">正在读取...</div>
+            <div id="ai-history-detail" style="display:none; color:var(--text-primary);">
+                <div class="ai-batch-header">
+                    <strong style="font-size:12px;">历史分析详情</strong>
+                    <span style="display:flex; gap:8px; align-items:center;">
+                        <span id="ai-history-detail-meta"></span>
+                        <button class="ai-action" onclick="closeAIHistoryDetail()">收起</button>
+                    </span>
+                </div>
+                <div id="ai-history-detail-requirements"></div>
+                <div id="ai-history-detail-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-review-modal" class="ai-modal-backdrop">
+        <div class="ai-modal-card" style="width:min(620px,94vw);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <strong>生成AI复盘总结</strong>
+                <button class="ai-action" onclick="closeAIReviewModal()">关闭</button>
+            </div>
+            <div id="ai-review-source" style="font-size:11px; color:var(--text-muted); margin-bottom:9px;"></div>
+            <label class="ai-field">复盘依据／实际结果
+                <textarea id="ai-review-guidance" maxlength="4000" style="min-height:100px; resize:vertical; background:#121418; color:#fff; border:1px solid var(--border-color); border-radius:4px; padding:7px 8px; font:11px/1.5 inherit;" placeholder="说明实际发生了什么，以及原回答哪里正确或错误"></textarea>
+            </label>
+            <div class="ai-form-grid" style="margin-top:9px;">
+                <label class="ai-field">适用范围<select id="ai-review-scope"><option value="CONTRACT">当前合约＋当前分析类型</option><option value="PRODUCT">同品种所有月份＋当前分析类型</option></select></label>
+                <label class="ai-field">总结模型<select id="ai-review-model"></select></label>
+            </div>
+            <div style="font-size:10px; color:#f59e0b; margin-top:8px;">总结先保存为草稿，只有你确认启用后才会提供给后续AI；错误或部分正确必须填写复盘依据。</div>
+            <div id="ai-review-message" style="min-height:18px; color:#f59e0b; font-size:11px; margin-top:6px;"></div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="ai-action" onclick="closeAIReviewModal()">取消</button>
+                <button id="ai-review-submit" class="ai-action ai-primary" onclick="submitAIReviewSummary()">开始生成</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-container">
+        <!-- 左侧：合约选择与异常事件流 -->
+        <div class="panel">
+            <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>监控合约</span>
+                <span style="font-size:10px; cursor:pointer; color:#3b82f6;" onclick="addGroupPrompt()" title="新建分组">＋分组</span>
+            </div>
+            <div id="contract-list"></div>
+
+            <div class="panel-title" style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+                <span>行情数据面板</span>
+                <span style="font-size:10px; cursor:pointer; color: #3b82f6;" onclick="refreshLeftTab()">刷新</span>
+            </div>
+            <div style="display:flex; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
+                <button class="period-btn active" id="ltab-btn-events" onclick="showLeftTab('events')">系统事件</button>
+                <button class="period-btn" id="ltab-btn-tape" onclick="showLeftTab('tape')">成交明细</button>
+                <button class="period-btn" id="ltab-btn-big" onclick="showLeftTab('big')">大单监控</button>
+            </div>
+            <div id="tab-events">
+                <div id="events-container">
+                    <div style="color:var(--text-muted); font-size:12px; padding:6px;">加载事件中...</div>
+                </div>
+            </div>
+            <div id="tab-tape" style="display:none;">
+                <div id="tape-container" style="max-height:240px; overflow-y:auto;">
+                    <div style="color:var(--text-muted); font-size:12px; padding:6px;">等待行情推送后生成成交明细...</div>
+                </div>
+            </div>
+            <div id="tab-big" style="display:none;">
+                <div id="bigorders-container" style="max-height:240px; overflow-y:auto;">
+                    <div style="color:var(--text-muted); font-size:12px; padding:6px;">暂无大单记录</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中间：K线图与均线 -->
+        <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <div class="header-title" id="current-contract-header">JM2701 - 焦煤</div>
+                    <button id="btn-switch-main" onclick="switchToMain()" style="display:none; background:#3b82f6; color:#fff; border:none; padding:3px 10px; border-radius:4px; font-size:11px; cursor:pointer;">切主连</button>
+                    <span id="main-tag" style="display:none; background:#1e3a5f; color:#7dd3fc; padding:3px 8px; border-radius:4px; font-size:11px;">主连合约</span>
+                    <span id="dominant-tag" style="display:none; background:#14532d; color:#86efac; padding:3px 8px; border-radius:4px; font-size:11px;"></span>
+                </div>
+                <div class="chart-controls">
+                    <button class="period-btn active" data-period="intraday" onclick="switchPeriod('intraday')">分时</button>
+                    <button class="period-btn" data-period="1d" onclick="switchPeriod('1d')">日线</button>
+                    <button class="period-btn" data-period="1m" onclick="switchPeriod('1m')">1分</button>
+                    <button class="period-btn" data-period="5m" onclick="switchPeriod('5m')">5分</button>
+                    <button class="period-btn" data-period="30m" onclick="switchPeriod('30m')">30分</button>
+                    <button class="period-btn" data-period="60m" onclick="switchPeriod('60m')">60分</button>
+                    <div class="legend" id="chart-legend">
+                        <div class="legend-item"><span class="legend-color" style="background:#facc15;"></span>EMA20</div>
+                        <div class="legend-item"><span class="legend-color" style="background:#a855f7;"></span>EMA60</div>
+                    </div>
+                    <div class="legend" id="intraday-legend" style="display:none;">
+                        <div class="legend-item"><span class="legend-color" style="background:#facc15;"></span>分时</div>
+                    <div class="legend-item" style="gap:4px;">
+                        <button class="period-btn" id="intraday-prev" onclick="intradayShift(-1)" style="padding:0 6px;" title="上一交易日">◀</button>
+                        <select id="intraday-day" onchange="intradayPick(this.value)" title="选择交易日"
+                            style="background:#1b1e24; border:1px solid var(--border-color); color:var(--text-muted); font-size:10px; padding:1px 2px; border-radius:3px; max-width:150px;">
+                            <option value="">交易日 --</option>
+                        </select>
+                        <button class="period-btn" id="intraday-next" onclick="intradayShift(1)" style="padding:0 6px;" title="下一交易日">▶</button>
+                        <span id="intraday-latest" style="cursor:pointer; color:#3b82f6; font-size:10px; display:none;" onclick="intradayLatest()">回到最新</span>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div id="ohlc-legend"></div>
+            <div id="main-chart-area" style="position:relative; flex:1; display:flex; min-height:300px;">
+                <div id="chart-wrapper" style="flex:1; min-height:0;"></div>
+                <div id="chart-notice" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:6; max-width:78%; background:rgba(27,30,36,0.95); border:1px solid var(--border-color); border-radius:8px; padding:14px 18px; font-size:12px; line-height:1.8; color:var(--text-muted); text-align:center;"></div>
+            </div>
+            <div style="display:flex; gap:4px; align-items:center; padding:3px 0 2px 8px; border-top:1px solid var(--border-color);">
+                <span style="font-size:10px; color:var(--text-muted);">副图指标</span>
+                <button class="period-btn sub-ind-active" data-sub="VOL" onclick="switchSubIndicator('VOL')">VOL</button>
+                <button class="period-btn" data-sub="MACD" onclick="switchSubIndicator('MACD')">MACD</button>
+                <button class="period-btn" data-sub="OI" onclick="switchSubIndicator('OI')">OI</button>
+                <button class="period-btn" data-sub="KDJ" onclick="switchSubIndicator('KDJ')">KDJ</button>
+                <button class="period-btn" data-sub="DMI" onclick="switchSubIndicator('DMI')">DMI</button>
+                <span id="sub-values" style="margin-left:auto; font-size:10px; color:var(--text-muted); font-family:monospace; padding-right:8px;"></span>
+            </div>
+            <div id="subchart-wrapper"></div>
+        </div>
+
+        <!-- 右侧：AI盘时段预测线与客观规则评分 -->
+        <div class="panel right-panel">
+            <div id="future-trend-panel" style="margin-bottom:12px; background:#172033; border:1px solid #334155; border-radius:6px; padding:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:7px;">
+                    <strong style="font-size:12px;">未来趋势</strong>
+                    <button id="future-trend-btn" class="ai-action ai-primary" onclick="openFutureTrendModal()">预测未来趋势</button>
+                </div>
+                <div id="future-trend-timer" role="timer" style="display:none; font-size:12px; color:#7dd3fc; margin-bottom:6px; font-variant-numeric:tabular-nums;"></div>
+                <div id="future-trend-summary" style="font-size:11px; color:var(--text-muted);">选择合约后可预测未来趋势</div>
+                <div id="ai-research-home-status" style="font-size:10px; margin-top:6px; color:var(--text-muted);"></div>
+                <details id="future-trend-details" style="display:none; margin-top:8px;">
+                    <summary style="cursor:pointer; font-size:11px; color:#93c5fd;">查看完整分析与来源</summary>
+                    <div id="future-trend-result" style="max-height:480px; overflow:auto; margin-top:8px;">
+                        <div id="future-trend-meta" style="font-size:10px;"></div>
+                        <div id="future-trend-requirements"></div>
+                        <div id="future-trend-list"></div>
+                    </div>
+                </details>
+            </div>
+            <div id="ai-session-line-control" style="margin-bottom:12px; background:#172033; border:1px solid #334155; border-radius:6px; padding:10px; font-size:11px; color:var(--text-muted);">
+                <b style="display:block; color:#e2e8f0; margin-bottom:5px;">AI盘时段预测线说明</b>
+                <div style="margin-bottom:6px; line-height:1.6;">盘前展望也会画线：灰色为盘前参考价，橙色为触发价，绿色为目标价，粉色为失效价；仅在所选小节内验证。</div>
+                <div class="ai-session-choice-row"><span>显示画线</span><div id="ai-session-time-strip" class="ai-session-choice-strip" style="display:none;">
+                    <button id="ai-session-line-times-prev" class="ai-session-choice-arrow" type="button" aria-label="上一组时间" onclick="scrollAISessionChoices('ai-session-line-times', -1)">◀</button>
+                    <div id="ai-session-line-times" class="ai-session-choice-list" onscroll="updateAISessionChoiceArrows('ai-session-line-times')"></div>
+                    <button id="ai-session-line-times-next" class="ai-session-choice-arrow" type="button" aria-label="下一组时间" onclick="scrollAISessionChoices('ai-session-line-times', 1)">▶</button>
+                </div></div>
+                <div id="ai-session-line-models" class="ai-session-choice-row" style="display:none;"><span>模型</span><div class="ai-session-choice-strip">
+                    <button id="ai-session-line-model-list-prev" class="ai-session-choice-arrow" type="button" aria-label="上一组模型" onclick="scrollAISessionChoices('ai-session-line-model-list', -1)">◀</button>
+                    <div id="ai-session-line-model-list" class="ai-session-choice-list" onscroll="updateAISessionChoiceArrows('ai-session-line-model-list')"></div>
+                    <button id="ai-session-line-model-list-next" class="ai-session-choice-arrow" type="button" aria-label="下一组模型" onclick="scrollAISessionChoices('ai-session-line-model-list', 1)">▶</button>
+                </div></div>
+                <div id="ai-session-line-meta" style="color:#e2e8f0; margin-bottom:5px;">暂无有效盘时段预测</div>
+                <div id="ai-session-line-legend" style="display:flex; gap:8px 16px; flex-wrap:wrap; line-height:1.6;">点击“盘时段画线”生成预测</div>
+            </div>
+            <div style="display:none;" aria-hidden="true">
+                <div id="ind-day-hl">-- / --</div>
+                <div id="ind-prev-hl">-- / --</div>
+                <div id="ind-atr">--</div>
+                <div id="ind-vwap">--</div>
+            </div>
+
+            <div class="analysis-toolbar">
+                <div class="analysis-toolbar-head">
+                    <span class="analysis-toolbar-title">智能量价多空雷达</span>
+                    <span id="analysis-data-time" class="analysis-toolbar-time">等待分析</span>
+                </div>
+                <div class="analysis-actions">
+                    <button id="ai-history-btn" class="ai-action" onclick="openAIHistoryModal()">历史</button>
+                    <button id="ai-analyze-btn" class="ai-action" onclick="openAIAnalysisModal()">AI 分析</button>
+                    <button id="ai-session-chart-btn" class="ai-action ai-primary" onclick="openAISessionModal()">盘时段画线</button>
+                    <button id="ai-verification-btn" class="ai-action" style="display:none; grid-column:1 / -1;" onclick="openAIVerificationModal()">模拟验证</button>
+                </div>
+            </div>
+            <div id="analysis-radar" style="background:#1e293b; border:1px solid var(--border-color); border-radius:6px; padding:9px; margin-bottom:12px; font-size:12px;">
+                <div id="analysis-status" style="color:var(--text-muted); margin-bottom:7px;">正在加载量价分析...</div>
+                <div id="analysis-ready" style="display:none;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:7px;">
+                        <div class="indicator-card">
+                            <div class="indicator-name">周度背景</div>
+                            <div id="analysis-week" style="font-weight:bold;">--</div>
+                            <div id="analysis-week-score" style="font-size:10px; color:var(--text-muted);">--分</div>
+                        </div>
+                        <div class="indicator-card">
+                            <div class="indicator-name">今日日内</div>
+                            <div id="analysis-day" style="font-weight:bold;">--</div>
+                            <div id="analysis-day-score" style="font-size:10px; color:var(--text-muted);">--分</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; gap:8px; color:var(--text-muted); margin-bottom:7px;">
+                        <span>5分钟量比 <b id="analysis-volume-ratio" style="color:#e2e8f0;">--</b></span>
+                        <span>持仓变化 <b id="analysis-oi-change" style="color:#e2e8f0;">--</b></span>
+                    </div>
+                    <div id="analysis-signal-box" style="border:1px solid #3b4555; border-radius:5px; padding:7px;">
+                        <div style="display:flex; justify-content:space-between; gap:8px;">
+                            <b id="analysis-signal-name">当前无满足规则的信号</b>
+                            <span id="analysis-signal-state" style="font-size:10px; color:#94a3b8;">--</span>
+                        </div>
+                        <div id="analysis-signal-action" style="font-size:11px; color:var(--text-muted); margin-top:4px;">等待已闭合5分钟K线</div>
+                        <div id="analysis-signal-risk" style="font-size:10px; color:#94a3b8; margin-top:4px;"></div>
+                    </div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-top:6px;">规则分数不是胜率；本卡片只读，不会自动下单。</div>
+                </div>
+            </div>
+            <div id="ai-analysis-results" style="display:none; margin-bottom:12px;">
+                <div class="ai-batch-header">
+                    <strong style="font-size:12px;">AI 模型判断</strong>
+                    <span id="ai-batch-meta" style="font-size:10px; color:var(--text-muted);"></span>
+                </div>
+                <div id="ai-batch-requirements"></div>
+                <div id="ai-result-list"></div>
+                <div style="font-size:10px; color:#f59e0b;">AI 判断仅供研究，不是胜率，也不会触发任何委托。</div>
+            </div>
+
+            <div id="rule-trade-section" style="display:none;">
+            <div class="panel-title">客观规则信号评估</div>
+            <div class="score-box">
+                <div>
+                    <div>当前信号类型</div>
+                    <div style="font-size:12px; color:var(--text-muted);">规则评分 (满分100)</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-weight:bold; font-size:16px;" id="sig-type">--</div>
+                    <div class="score-val" id="sig-score">--</div>
+                </div>
+            </div>
+
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">规则条件追溯依据：</div>
+            <div id="reasons-container">
+                <div class="reason-box" style="color:var(--text-muted);">暂无触发记录</div>
+            </div>
+
+            <!-- 交易与持仓风控面板 (Paper Trading) -->
+            <div class="panel-title" style="margin-top: 14px; display:flex; justify-content:space-between; align-items:center;">
+                <span id="trade-panel-title">模拟账户与交易</span>
+                <span style="font-size:10px; cursor:pointer; color:#3b82f6;" onclick="loadTradeData()">刷新</span>
+            </div>
+
+            <div id="trade-mode-banner" style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:10px; font-size:12px;">
+                <span style="color:#38bdf8; font-weight:bold;">■ 模拟交易</span>
+                <span style="color:var(--text-muted); font-size:11px;"> — 初始资金 100 万模拟资金, 本地撮合, 与实盘资金完全隔离</span>
+            </div>
+
+
+            <!-- 策略跟单与止损止盈设置 -->
+            <div id="auto-trade-panel" style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:10px; font-size:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="font-weight:bold; color:#facc15;">客观信号自动跟单</span>
+                    <label style="display:inline-flex; align-items:center; cursor:pointer; gap:4px;">
+                        <input id="auto-trade-toggle" type="checkbox" onchange="toggleAutoTrade(this.checked)" style="cursor:pointer;">
+                        <span id="auto-trade-status" style="font-size:11px; color:#ef4444;">未启用</span>
+                    </label>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+                    <span>触发门槛: ≥80分</span>
+                    <span>跟单手数: 1手</span>
+                    <span>保护止损: 自动挂接</span>
+                </div>
+            </div>
+
+            <!-- 资金概览 -->
+            <div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:10px; font-size:12px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="color:var(--text-muted);">动态权益:</span>
+                    <span id="acc-dynamic" style="font-weight:bold; color:#38bdf8;">--</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="color:var(--text-muted);">可用资金:</span>
+                    <span id="acc-available" style="font-weight:bold;">--</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="color:var(--text-muted);">占用保证金:</span>
+                    <span id="acc-margin">--</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="color:var(--text-muted);">持仓浮动盈亏:</span>
+                    <span id="acc-floating-pnl" style="font-weight:bold;">--</span>
+                </div>
+            </div>
+
+            <!-- 快速下单操作区 -->
+            <div style="background:#232731; padding:10px; border-radius:6px; margin-bottom:10px;">
+                <div style="display:flex; gap:6px; margin-bottom:8px;">
+                    <select id="trade-price-mode" aria-label="委托价格方式" onchange="setTradePriceMode()" style="width:78px; background:#1b1e24; border:1px solid var(--border-color); color:#fff; border-radius:4px; font-size:12px;">
+                        <option value="limit">限价</option>
+                        <option value="opponent">对手价</option>
+                    </select>
+                    <input id="trade-price" type="number" step="0.5" placeholder="委托价" style="flex:1; min-width:0; background:#1b1e24; border:1px solid var(--border-color); color:#fff; padding:5px 8px; border-radius:4px; font-size:12px;">
+                    <input id="trade-vol" type="number" min="1" max="50" value="1" placeholder="手数" style="width:60px; background:#1b1e24; border:1px solid var(--border-color); color:#fff; padding:5px 8px; border-radius:4px; font-size:12px;">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
+                    <button class="trade-order-btn" onclick="quickOrder('BUY', 'OPEN', true)" style="background:#dc2626; color:#fff; border:none; padding:9px 4px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">对手价买多</button>
+                    <button class="trade-order-btn" onclick="quickOrder('SELL', 'OPEN', true)" style="background:#16a34a; color:#fff; border:none; padding:9px 4px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">对手价卖空</button>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:6px;">
+                    <button class="trade-order-btn" onclick="quickOrder('BUY', 'OPEN')" style="background:#dc2626; color:#fff; border:none; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">买开 (做多)</button>
+                    <button class="trade-order-btn" onclick="quickOrder('SELL', 'OPEN')" style="background:#16a34a; color:#fff; border:none; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">卖开 (做空)</button>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+                    <button class="trade-order-btn" onclick="quickOrder('SELL', 'CLOSE')" style="background:#ef4444; color:#fff; border:none; padding:5px; border-radius:4px; cursor:pointer; font-size:12px; opacity:0.85;">卖平 (平多)</button>
+                    <button class="trade-order-btn" onclick="quickOrder('BUY', 'CLOSE')" style="background:#22c55e; color:#fff; border:none; padding:5px; border-radius:4px; cursor:pointer; font-size:12px; opacity:0.85;">买平 (平空)</button>
+
+                <!-- 一键紧急全平 -->
+                <div style="margin-top:6px;">
+                    <button id="emergency-close-btn" onclick="emergencyCloseAll()" style="width:100%; background:#7f1d1d; color:#fca5a5; border:1px solid #b91c1c; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">⚠ 一键紧急全平所有持仓</button>
+                </div>
+</div>
+            </div>
+
+            <!-- 持仓明细与挂单列表 -->
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">当前持仓明细：</div>
+            <div id="positions-list" style="max-height:110px; overflow-y:auto; margin-bottom:10px;">
+                <div style="color:var(--text-muted); font-size:11px;">暂无持仓</div>
+            </div>
+
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">活跃挂单：</div>
+            <div id="orders-list" style="max-height:100px; overflow-y:auto;">
+                <div style="color:var(--text-muted); font-size:11px;">暂无挂单</div>
+            </div>
+
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">最近成交：</div>
+            <div id="trades-list" style="max-height:100px; overflow-y:auto;">
+                <div style="color:var(--text-muted); font-size:11px;">暂无成交记录</div>
+            </div>
+            </div>
+
+        </div>
+    </div>
+
+    <aside id="market-simulator-drawer" class="market-simulator-drawer" role="dialog" aria-labelledby="market-simulator-title" hidden>
+        <button id="market-simulator-close" type="button" style="float:right">关闭</button>
+        <h2 id="market-simulator-title">行情模拟</h2>
+        <p class="market-simulator-warning">模拟模式，不会产生真实交易。仅分析假设条件，不预测发生概率。</p>
+        <p id="market-simulator-status" role="status"></p>
+        <p id="market-simulator-error" class="market-simulator-warning" role="alert"></p>
+        <p id="market-simulator-meta" class="market-simulator-meta"></p>
+        <p id="market-simulator-stale" class="market-simulator-warning"></p>
+        <button id="market-simulator-update" type="button">更新基准</button>
+        <button id="market-simulator-reset" type="button">重置假设</button>
+        <label>假设15分钟收盘价 <input id="market-simulator-price" type="number" inputmode="decimal"></label>
+        <input id="market-simulator-price-range" type="range" aria-label="假设收盘价滑块">
+        <p id="market-simulator-range-note" class="market-simulator-meta"></p>
+        <label>整根15分钟柱量比（前20根闭合柱均量） <input id="market-simulator-volume" type="number" min="0" step="0.01"></label>
+        <input id="market-simulator-volume-range" type="range" min="0" max="3" step="0.01" aria-label="假设量比滑块">
+        <label>相对上一闭合柱的持仓变化（手） <input id="market-simulator-oi" type="number" step="1" inputmode="numeric"></label>
+        <div id="market-simulator-presets"></div>
+        <div id="market-simulator-results" class="market-simulator-table"></div>
+    </aside>
+
+    <script src="/js/01-core.js"></script>
+    <script src="/js/02-chart.js"></script>
+    <script src="/js/03-contracts.js"></script>
+    <script src="/js/04-subchart.js"></script>
+    <script src="/js/05-data.js"></script>
+    <script src="/js/06-ai-session.js"></script>
+    <script src="/js/07-ai-models.js"></script>
+    <script src="/js/08-ai-research.js"></script>
+    <script src="/js/09-ai-analysis.js"></script>
+    <script src="/js/10-tape.js"></script>
+    <script src="/js/11-websocket.js"></script>
+    <script src="/js/12-trading.js"></script>
+    <script src="/js/13-boot.js"></script>
+    <script src="/js/14-ai-verification.js"></script>
+    <script src="/js/15-market-simulator.js"></script>
+</body>
+</html>

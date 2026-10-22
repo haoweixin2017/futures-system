@@ -1,0 +1,43 @@
+ctp:
+  # 中信期货仿真/实盘或标准CTP前置地址
+  md_address: "tcp://180.168.146.187:10131"   # 示例：开放仿真前置或中信下发前置
+  td_address: "tcp://180.168.146.187:10130"   # 交易前置（第一期仅做只读/保留）
+  broker_id: "9999"                           # 期货公司 BrokerID
+  user_id: ""                                 # 资金账号
+  password: ""                                # 密码
+  app_id: "simnow_client_test"
+  auth_code: "0000000000000000"
+  flow_path: "./ctp_flow/"
+
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  db: 0
+  password: ""
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  password: ""
+  database: "citic_futures"
+  pool_size: 10
+  pool_recycle: 3600
+
+system:
+  log_level: "INFO"
+  periods: ["1m", "5m", "15m", "30m", "60m"]
+  save_raw_tick: false                        # 第一版内存优化：仅保存1mK线及关键Tick
+  # 行情源: sina=新浪免费实时(默认) / simulator=内置模拟(开发调试) / ctp=中信CTP柜台
+  feed: "sina"
+  poll_interval: 0.8                          # 实时快照轮询间隔(秒)
+  universe_refresh_seconds: 300               # 全市场合约列表刷新周期(秒)
+  backfill_on_subscribe: true                 # 订阅新合约时自动回补历史K线
+  big_order_min_volume: 100                   # 大单监控阈值 (单笔现手手数)
+
+  # ---- 模拟盘撮合参数 ----
+  # 高仿真的关键: 不加这些, 模拟盈亏会被系统性高估。
+  paper_fill_uses_opponent: true              # 成交价考虑对手价(卖一/买一), 而非只看最新价
+                                              # 关闭后回退为"一律按最新价成交", 会忽略买卖价差成本
+  paper_slippage_ticks: 0.0                   # 额外滑点, 以最小变动价位为单位 (买单加价/卖单减价)
+  paper_commission_per_lot: 0.0               # 每手手续费(元); 0 表示不收取

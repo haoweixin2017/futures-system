@@ -1,0 +1,123 @@
+# 默认不请求线上。启用前填入正式交易日历和已核实的正文映射。
+database:
+  url: sqlite:///runtime/receipts.sqlite3
+network:
+  rate_state: runtime/request-rate.sqlite3
+  interval_seconds: 8
+  max_per_minute: 6
+  attempts: 3
+  backoff_seconds: 8
+  timeout_seconds: 15
+  max_response_bytes: 1048576
+  user_agent: PersonalFuturesResearch/1.0
+  obey_robots: true
+  allow_http: false
+alerts:
+  webhook_env: RECEIPT_ALERT_WEBHOOK
+  timeout_seconds: 5
+validation:
+  tolerance: 0
+  min_history: 20
+  sigma: 3
+  require_previous: false
+  require_reference: false
+  reference_file: null
+schedule:
+  timezone: Asia/Shanghai
+  time: '18:30'
+  poll_seconds: 300
+  max_polls: 6
+  lookback_days: 7
+exchanges:
+  CZCE:
+    enabled: false
+    calendar: tests/fixtures/calendar.yaml
+    varieties: [SR]
+    mode: html
+    encoding: utf-8  # 正式来源为GB18030时按原文调整
+    base_url: null  # 由用户核实，禁止填猜测入口
+    request:
+      method: GET
+      path: null
+      headers: {}
+      body: null
+    fixture: tests/fixtures/czce.html
+    fixture_date: '2026-09-30'
+    parser:
+      format: html
+      table_selector: '#receipts'
+      row_selector: 'tbody tr'
+      cell_selector: 'td'
+      date_selector: '#trade-date'
+      date_format: '%Y-%m-%d'
+      fields: {variety: 0, detail_id: 1, warehouse: 2, warehouse_type: 3, grade: 4, warr_yesterday: 5, warr_today: 6, warr_chg: 7, unit_raw: 8, row_type: 9, is_converted_warrant: 10}
+      total_value: TOTAL
+      detail_value: DETAIL
+      warehouse_types: {仓库: 仓库, 厂库: 厂库, 车板: 车板}
+      converted_values: ['是']
+    mapping:
+      SR: {exchange_code: SR, unit_raw: 吨, conversion_factor: 1, conversion_basis: '原文单位为吨'}
+    market:
+      enabled: false
+      base_url: null
+      request: {method: GET, path: null, headers: {}, body: null}
+      fixture: tests/fixtures/market.json
+      parser:
+        records_path: data
+        fields: {trade_date: date, variety: variety, main_contract: contract, settle: settle, oi: oi, volume: volume, is_main: is_main}
+        main_value: true
+  DCE:
+    enabled: false
+    calendar: tests/fixtures/calendar.yaml
+    varieties: [JD, LH]
+    mode: api
+    base_url: http://www.dce.com.cn/dceapi
+    allow_http: true  # 已验证官方接口使用HTTP；仅此固定来源例外
+    request:
+      method: POST
+      path: /forward/publicweb/dailystat/wbillWeeklyQuotes
+      headers: {apikey: '{env:DCE_API_KEY}', Authorization: 'Bearer {token}'}
+      body: {varietyId: '{product_lower}', tradeDate: '{date_compact}'}
+    auth:
+      request:
+        method: POST
+        path: /cms/auth/accessToken
+        headers: {apikey: '{env:DCE_API_KEY}'}
+        body: {secret: '{env:DCE_API_SECRET}'}
+      token_path: data.token
+      response_checks: {success: true, code: 200}
+    fixture: tests/fixtures/dce.json
+    fixture_date: '2026-09-30'
+    parser:
+      format: json
+      records_path: data.entityList
+      success_path: success
+      success_value: true
+      fields: {variety: varietyOrder, parent_id: groupCodeOrder, detail_id: whCodeOrder, warehouse_type: whType, warehouse: whAbbr, grade: grade, trade_date: genDate, warr_yesterday: lastWbillQty, warr_today: wbillQty, warr_chg: diff}
+      date_format: '%Y%m%d'
+      # 1/2用于官方层级，真实仓库/厂库类型未核实时留空，不能据此猜测。
+      group_value: '1'
+      detail_value: '2'
+      warehouse_types: {仓库: 仓库, 厂库: 厂库, 车板: 车板}
+      unit_raw: 手
+      table_selector: '#receipts'
+      row_selector: 'tbody tr'
+      cell_selector: 'td'
+      date_selector: '#trade-date'
+      html_date_format: '%Y-%m-%d'
+      html_detail_value: DETAIL
+      html_fields: {variety: 0, detail_id: 1, warehouse: 2, warehouse_type: 3, grade: 4, warr_yesterday: 5, warr_today: 6, warr_chg: 7, unit_raw: 8, row_type: 9, is_converted_warrant: 10}
+      total_value: TOTAL
+      converted_values: ['是']
+    mapping:
+      JD: {exchange_code: jd, unit_raw: 手, conversion_factor: null, conversion_basis: ''}
+      LH: {exchange_code: lh, unit_raw: 手, conversion_factor: null, conversion_basis: ''}
+    market:
+      enabled: false
+      base_url: null
+      request: {method: GET, path: null, headers: {}, body: null}
+      fixture: tests/fixtures/market.json
+      parser:
+        records_path: data
+        fields: {trade_date: date, variety: variety, main_contract: contract, settle: settle, oi: oi, volume: volume, is_main: is_main}
+        main_value: true

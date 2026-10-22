@@ -1,0 +1,6 @@
+# 离线测试样例，不是正式交易所日历；线上模式启动会拒绝。
+fixture_only: true
+source: offline-test-example
+start: '2026-09-29'
+end: '2026-10-08'
+dates: ['2026-09-29', '2026-09-30', '2026-10-08']

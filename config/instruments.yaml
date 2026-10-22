@@ -1,0 +1,16 @@
+instruments:
+  - symbol: "JM2701"
+    exchange: "DCE"
+    name: "焦煤2701"
+    price_tick: 0.5
+    volume_multiple: 60
+  - symbol: "FU2610"
+    exchange: "SHFE"
+    name: "燃油2610"
+    price_tick: 1.0
+    volume_multiple: 10
+  - symbol: "BU2610"
+    exchange: "SHFE"
+    name: "沥青2610"
+    price_tick: 1.0
+    volume_multiple: 10
